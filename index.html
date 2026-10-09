@@ -14,6 +14,98 @@
   }
   .container { max-width: 1250px; margin: 0 auto; }
 
+  /* ============ GİRİŞ EKRANI ============ */
+  .login-screen {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #4a3f8a 0%, #667eea 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 999;
+  }
+  .login-box {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    padding: 36px 30px;
+    width: 100%;
+    max-width: 400px;
+  }
+  .login-box h1 {
+    text-align: center;
+    font-size: 22px;
+    color: #4a3f8a;
+    margin-bottom: 6px;
+  }
+  .login-box .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 26px;
+  }
+  .login-box label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+  .login-box input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid #e0e4ec;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+  }
+  .login-box input:focus { border-color: #667eea; }
+  .login-btn {
+    width: 100%;
+    padding: 13px;
+    background: #667eea;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: all 0.15s;
+  }
+  .login-btn:hover { background: #5568d3; }
+  .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .login-error {
+    background: #fee;
+    color: #c0392b;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 14px;
+    display: none;
+    border-left: 3px solid #e74c3c;
+  }
+  .login-error.show { display: block; }
+  .login-info {
+    background: #f0f4ff;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-size: 11px;
+    color: #4a3f8a;
+    margin-top: 20px;
+    line-height: 1.7;
+    border-left: 3px solid #667eea;
+  }
+
+  /* ============ ANA UYGULAMA ============ */
+  .app { display: none; }
+  .app.active { display: block; }
+
   .card {
     background: #fff;
     border-radius: 12px;
@@ -21,7 +113,6 @@
     margin-bottom: 16px;
     overflow: hidden;
   }
-
   .card-header {
     background: linear-gradient(135deg, #4a3f8a 0%, #667eea 100%);
     color: #fff;
@@ -34,7 +125,7 @@
   }
   .card-header h2 { font-size: 16px; font-weight: 600; }
   .card-header .subtitle { font-size: 11px; opacity: 0.85; margin-top: 2px; }
-  .card-header .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .card-header .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
   button {
     padding: 9px 14px;
@@ -46,6 +137,7 @@
     transition: all 0.15s;
     font-family: inherit;
   }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-light { background: rgba(255,255,255,0.18); color: #fff; }
   .btn-light:hover { background: rgba(255,255,255,0.3); }
   .btn-primary { background: #667eea; color: #fff; }
@@ -54,6 +146,26 @@
   .btn-secondary:hover { background: #d5dbe6; }
   .btn-danger { background: #e74c3c; color: #fff; }
   .btn-danger:hover { background: #c0392b; }
+
+  .user-badge {
+    background: rgba(255,255,255,0.15);
+    padding: 7px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sync-badge {
+    background: #27ae60;
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .sync-badge.offline { background: #e74c3c; }
+  .sync-badge.syncing { background: #e67e22; }
 
   /* ============ GİRİŞ FORMU ============ */
   .entry-form { padding: 20px; background: #fafbfd; }
@@ -85,15 +197,11 @@
   }
   .form-group input:focus, .form-group select:focus { border-color: #667eea; }
 
-  /* Öğrenci kilidi */
-  .student-lock-wrapper {
-    position: relative;
-  }
+  .student-lock-wrapper { position: relative; }
   .form-group select.locked {
     background: #f5f5f7;
     color: #999;
     cursor: not-allowed;
-    border-color: #e0e4ec;
     border-style: dashed;
   }
   .student-lock-overlay {
@@ -109,25 +217,19 @@
     color: #999;
     pointer-events: none;
   }
-  .student-lock-overlay.unlocked {
-    display: none;
-  }
+  .student-lock-overlay.unlocked { display: none; }
 
   .subjects-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 12px;
   }
-  @media (max-width: 900px) {
-    .subjects-grid { grid-template-columns: repeat(3, 1fr); }
-  }
+  @media (max-width: 900px) { .subjects-grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 700px) {
     .subjects-grid { grid-template-columns: repeat(2, 1fr); }
     .form-row { grid-template-columns: 1fr; }
   }
-  @media (max-width: 480px) {
-    .subjects-grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 480px) { .subjects-grid { grid-template-columns: 1fr; } }
 
   .subject-input-card {
     background: #fff;
@@ -187,11 +289,6 @@
   .counter-btn.plus:hover { background: #667eea; color: #fff; }
   .counter-btn.minus:hover { background: #e74c3c; color: #fff; }
   .counter-btn:active { transform: scale(0.92); }
-  .counter-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
 
   .counter-value {
     flex: 1;
@@ -204,7 +301,6 @@
   }
   .counter-value.has-value { color: #27ae60; }
 
-  /* Otomatik kilit sayacı */
   .unlock-timer {
     position: absolute;
     top: -8px;
@@ -217,16 +313,8 @@
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(39,174,96,0.4);
   }
-  .unlock-timer.warn {
-    background: #e67e22;
-    box-shadow: 0 2px 6px rgba(230,126,34,0.4);
-    animation: timerPulse 0.5s infinite;
-  }
-  .unlock-timer.danger {
-    background: #e74c3c;
-    box-shadow: 0 2px 6px rgba(231,76,60,0.5);
-    animation: timerPulse 0.35s infinite;
-  }
+  .unlock-timer.warn { background: #e67e22; animation: timerPulse 0.5s infinite; }
+  .unlock-timer.danger { background: #e74c3c; animation: timerPulse 0.35s infinite; }
   @keyframes timerPulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.12); }
@@ -241,7 +329,7 @@
   }
   .form-actions button { padding: 11px 22px; font-size: 13px; }
 
-  /* ============ KAYITLAR TABLOSU ============ */
+  /* ============ TABLO ============ */
   .table-wrapper { overflow-x: auto; max-height: 60vh; }
   table.records { width: 100%; border-collapse: collapse; font-size: 13px; }
   table.records thead th {
@@ -257,7 +345,6 @@
     white-space: nowrap;
     border-right: 1px solid rgba(255,255,255,0.12);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
   }
   table.records thead th.col-tarih,
   table.records thead th.col-isim { background: #3a3070; }
@@ -270,13 +357,8 @@
   }
   table.records tbody tr:hover { background: #f8faff; }
   table.records tbody tr:nth-child(even) { background: #fcfdff; }
-  table.records tbody tr:nth-child(even):hover { background: #f3f6ff; }
-
   table.records tbody td.col-tarih,
-  table.records tbody td.col-isim {
-    text-align: left;
-    font-weight: 600;
-  }
+  table.records tbody td.col-isim { text-align: left; font-weight: 600; }
   table.records tbody td.col-tarih { color: #4a3f8a; white-space: nowrap; }
   table.records tbody td.col-isim { color: #2c3e50; min-width: 180px; }
 
@@ -288,7 +370,7 @@
     font-weight: 700;
     font-size: 15px;
   }
-  .num-cell.zero { color: #c5ccd8; background: transparent; }
+  .num-cell.zero { color: #c5ccd8; }
   .num-cell.pos { color: #27ae60; background: #d4f5d9; }
   .num-cell.high { color: #e67e22; background: #ffe8cc; }
 
@@ -298,12 +380,9 @@
     color: #4a3f8a !important;
     border-left: 2px solid #e8ecf3;
   }
-
   .row-actions button { padding: 5px 10px; font-size: 11px; margin: 0 2px; }
-
   .empty-state { text-align: center; padding: 50px 20px; color: #999; }
   .empty-state h3 { color: #4a3f8a; margin-bottom: 8px; font-size: 16px; }
-
   .record-count-badge {
     background: rgba(255,255,255,0.18);
     color: #fff;
@@ -546,79 +625,112 @@
 </head>
 <body>
 
-<div class="global-status-bar" id="globalStatusBar">
-  <span>🔓 <strong id="gsName">—</strong></span>
-  <span class="timer" id="gsTimer">30s</span>
+<!-- ============ GİRİŞ EKRANI ============ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h1>📚 Soru Takip Sistemi</h1>
+    <div class="subtitle">🔒 Öğretmen girişi</div>
+
+    <label>Kullanıcı Adı</label>
+    <input type="text" id="loginUsername" placeholder="matematik" autocomplete="username">
+
+    <label>Şifre</label>
+    <input type="password" id="loginPassword" placeholder="••••••" autocomplete="current-password"
+           onkeydown="if(event.key==='Enter') doLogin()">
+
+    <button class="login-btn" onclick="doLogin()" id="loginBtn">🔓 Giriş Yap</button>
+    <div class="login-error" id="loginError"></div>
+
+    <div class="login-info">
+      <strong>Demo hesaplar:</strong><br>
+      👑 <code>admin / admin123</code><br>
+      👨‍🏫 <code>matematik / mat123</code><br>
+      👨‍🏫 <code>fen / fen123</code><br>
+      👨‍🏫 <code>turkce / tur123</code>
+    </div>
+  </div>
 </div>
 
-<div class="container">
-
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <h2>📝 Yeni Soru Kaydı</h2>
-        <div class="subtitle">🔐 + tuşuna basınca ders şifresi istenir • 30 sn sonra kilitlenir ve sayı sıfırlanır</div>
-      </div>
-      <div class="actions">
-        <button class="btn-light" onclick="openStudentsModal()">👥 Öğrenciler</button>
-        <button class="btn-light" onclick="openSubjectsModal()">📖 Dersler & Şifreler</button>
-        <button class="btn-light" onclick="askExcelPassword()">📥 Excel İndir</button>
-      </div>
-    </div>
-
-    <div class="entry-form">
-      <div class="form-row">
-        <div class="form-group">
-          <label>📅 Tarih</label>
-          <input type="date" id="entryDate">
+<!-- ============ ANA UYGULAMA ============ -->
+<div class="app" id="app">
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>📝 Yeni Soru Kaydı</h2>
+          <div class="subtitle">🔐 + tuşuna basınca ders şifresi istenir • 30 sn sonra kilitlenir</div>
         </div>
-        <div class="form-group">
-          <label>👤 Öğrenci</label>
-          <div class="student-lock-wrapper">
-            <select id="entryStudent" class="locked" disabled>
-              <option value="">— Önce ders şifresi girin —</option>
-            </select>
-            <div class="student-lock-overlay" id="studentLockOverlay">
-              🔒 Ders şifresi girin
+        <div class="actions">
+          <div class="user-badge">
+            👤 <strong id="currentUser">—</strong>
+            <span class="sync-badge" id="syncBadge">☁️ Bağlı</span>
+          </div>
+          <button class="btn-light" onclick="openStudentsModal()">👥 Öğrenciler</button>
+          <button class="btn-light" onclick="openSubjectsModal()">📖 Dersler</button>
+          <button class="btn-light" onclick="askExcelPassword()">📥 Excel</button>
+          <button class="btn-light" onclick="doLogout()">🚪 Çıkış</button>
+        </div>
+      </div>
+
+      <div class="entry-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>📅 Tarih</label>
+            <input type="date" id="entryDate">
+          </div>
+          <div class="form-group">
+            <label>👤 Öğrenci</label>
+            <div class="student-lock-wrapper">
+              <select id="entryStudent" class="locked" disabled>
+                <option value="">— Önce ders şifresi girin —</option>
+              </select>
+              <div class="student-lock-overlay" id="studentLockOverlay">
+                🔒 Ders şifresi girin
+              </div>
             </div>
           </div>
         </div>
+
+        <label style="display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">📚 Ders Bazlı Soru Sayısı</label>
+        <div class="subjects-grid" id="subjectsGrid"></div>
+
+        <div class="form-actions" style="margin-top:18px;">
+          <button class="btn-secondary" onclick="resetForm()">🔄 Formu Temizle</button>
+          <button class="btn-primary" onclick="saveRecord()" id="saveBtn">💾 Kaydet</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h2>📊 Kayıtlar</h2>
+          <div class="subtitle">☁️ Supabase'den canlı • Aynı gün + aynı öğrenci için üzerine eklenir</div>
+        </div>
+        <div class="actions">
+          <span class="record-count-badge" id="recordCount">Yükleniyor...</span>
+          <button class="btn-light" onclick="refreshRecords()">🔄 Yenile</button>
+          <button class="btn-light" onclick="clearMyRecords()">🗑️ Kendi Kayıtlarımı Sil</button>
+        </div>
       </div>
 
-      <label style="display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">📚 Ders Bazlı Soru Sayısı</label>
-      <div class="subjects-grid" id="subjectsGrid"></div>
-
-      <div class="form-actions" style="margin-top:18px;">
-        <button class="btn-secondary" onclick="resetForm()">🔄 Formu Temizle</button>
-        <button class="btn-primary" onclick="saveRecord()" id="saveBtn">💾 Kaydet</button>
+      <div class="table-wrapper">
+        <table class="records" id="recordsTable">
+          <thead id="recordsHead"></thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+        <div id="emptyState" class="empty-state" style="display:none;">
+          <h3>📋 Henüz kayıt yok</h3>
+          <p>Yukarıdaki formu doldurup "Kaydet" butonuna basın.</p>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <h2>📊 Kayıtlar</h2>
-        <div class="subtitle">Aynı gün + aynı öğrenci için üzerine eklenir</div>
-      </div>
-      <div class="actions">
-        <span class="record-count-badge" id="recordCount">0 kayıt</span>
-        <button class="btn-light" onclick="clearAllRecords()">🗑️ Tümünü Sil</button>
-      </div>
-    </div>
-
-    <div class="table-wrapper">
-      <table class="records" id="recordsTable">
-        <thead id="recordsHead"></thead>
-        <tbody id="recordsBody"></tbody>
-      </table>
-      <div id="emptyState" class="empty-state" style="display:none;">
-        <h3>📋 Henüz kayıt yok</h3>
-        <p>Yukarıdaki formu doldurup "Kaydet" butonuna basın.</p>
-      </div>
-    </div>
-  </div>
-
+<div class="global-status-bar" id="globalStatusBar">
+  <span>🔓 <strong id="gsName">—</strong></span>
+  <span class="timer" id="gsTimer">30s</span>
 </div>
 
 <!-- DERS ŞİFRE MODAL -->
@@ -633,14 +745,12 @@
         <div class="label">Ders</div>
         <div class="name" id="spSubjectName">—</div>
       </div>
-
       <div class="password-input-wrapper">
         <input type="password" id="spInput" class="password-input" placeholder="••••" maxlength="30"
                onkeydown="if(event.key==='Enter') submitSubjectPassword()"
                oninput="document.getElementById('spInput').classList.remove('error')" autocomplete="off">
         <button class="toggle-pw" onclick="toggleSubjectPw()" id="spToggleBtn" type="button">👁️ Göster</button>
       </div>
-
       <div class="num-pad">
         <button class="num-btn" onclick="spPress('1')">1</button>
         <button class="num-btn" onclick="spPress('2')">2</button>
@@ -655,12 +765,10 @@
         <button class="num-btn" onclick="spPress('0')">0</button>
         <button class="num-btn enter" onclick="submitSubjectPassword()">✓</button>
       </div>
-
       <div class="password-hint">
         ✅ Doğru şifre girilince ders <strong>30 saniye</strong> açık kalır.<br>
         ⏱️ Süre bitince <strong>girilen sayı sıfırlanır</strong> ve kilit geri gelir.
       </div>
-
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeModal('subjectPasswordModal')">İptal</button>
       </div>
@@ -668,7 +776,7 @@
   </div>
 </div>
 
-<!-- YÖNETİCİ ŞİFRE MODAL -->
+<!-- YÖNETİCİ / EXCEL ŞİFRE MODAL -->
 <div class="modal-overlay" id="adminPasswordModal">
   <div class="modal">
     <div class="modal-header">
@@ -724,10 +832,7 @@
       <div class="info-box">
         Format: <code>ders adı, şifre</code><br>
         Şifre değiştirmek için yeni şifreyi yazın.<br>
-        Şifre alanını <strong>boş bırakırsanız eski şifre korunur</strong>.<br>
-        Örnek:<br>
-        <code>matematik, yeniSifre123</code><br>
-        <code>fen</code> (eski şifre korunur)
+        Şifre alanını <strong>boş bırakırsanız eski şifre korunur</strong>.
       </div>
       <textarea id="subjectsTextarea" style="min-height:220px;"></textarea>
       <div class="modal-actions">
@@ -738,20 +843,22 @@
   </div>
 </div>
 
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+  /* ============================================================
+     ⚠️ BURAYI DOLDURUN — Supabase bilgileriniz
+     ============================================================ */
+  const SUPABASE_URL = 'https://bdeoxaviopnskmpyjhxs.supabase.co';       // ← kendi URL'iniz
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZW94YXZpb3Buc2ttcHlqaHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NDg0MzUsImV4cCI6MjEwNzEyNDQzNX0.yLJWzVk_CaVqdxdiAcEsdu9idlAOFlxHU3c3pWjJ2nQ';                 // ← kendi anon key'iniz
+
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   /* ============ SABİTLER ============ */
-  const KEY_STUDENTS = 'sts_v11_students';
-  const KEY_SUBJECTS = 'sts_v11_subjects';
-  const KEY_RECORDS  = 'sts_v11_records';
-  const KEY_ADMIN    = 'sts_v11_admin_hash';
-  const KEY_EXCEL    = 'sts_v11_excel_hash';
-
-  const ADMIN_PASSWORD_DEFAULT = 'admin123';
-  const EXCEL_PASSWORD_DEFAULT = 'excel123';
-
   const UNLOCK_DURATION = 30 * 1000;
-  const WARN_THRESHOLD  = 10 * 1000;  // 10 sn kala turuncu
-  const DANGER_THRESHOLD = 5 * 1000;  // 5 sn kala kırmızı
+  const WARN_THRESHOLD  = 10 * 1000;
+  const DANGER_THRESHOLD = 5 * 1000;
 
   const DEFAULT_STUDENTS_RAW = `108-ELA YAYLACIOĞLU
 10-DERYA ATLIOĞLU
@@ -788,77 +895,129 @@
 90-ZEYNEP AKKAYA
 93-FEYZA YAĞMUR`;
 
-  const DEFAULT_SUBJECTS = [
-    { name: 'matematik', password: 'mat123' },
-    { name: 'türkçe',    password: 'tur123' },
-    { name: 'fen',       password: 'fen123' },
-    { name: 'sosyal',    password: 'sos123' },
-    { name: 'ingilizce', password: 'ing123' }
-  ];
-
-  /* ============ HASH ============ */
-  async function sha256(text) {
-    const enc = new TextEncoder().encode('sts_v11_salt_' + text);
-    const buf = await crypto.subtle.digest('SHA-256', enc);
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
   /* ============ DURUM ============ */
-  let students = JSON.parse(localStorage.getItem(KEY_STUDENTS) || 'null');
-  let subjects = JSON.parse(localStorage.getItem(KEY_SUBJECTS) || 'null');
-  let records  = JSON.parse(localStorage.getItem(KEY_RECORDS)  || '[]');
-  let adminHash = localStorage.getItem(KEY_ADMIN) || null;
-  let excelHash = localStorage.getItem(KEY_EXCEL) || null;
-
+  let currentUser = null;
+  let students = [];
+  let subjects = [];
+  let records = [];
   let currentCounts = {};
   let currentEditingId = null;
-
-  let unlockedSubjects = {};  // { name: timestamp }
+  let unlockedSubjects = {};
   let unlockTimerInterval = null;
 
   let pendingSubjectAction = null;
   let pendingAdminAction = null;
   let pendingExcelAction = false;
+  let adminPasswordCheck = null;  // admin password check via supabase
 
-  /* ============ BAŞLAT ============ */
-  async function init() {
-    if (!students || students.length !== 34) {
-      students = parseStudents(DEFAULT_STUDENTS_RAW);
-    }
-    if (!subjects || subjects.length === 0) {
-      subjects = [];
-      for (const s of DEFAULT_SUBJECTS) {
-        subjects.push({ name: s.name, passwordHash: await sha256(s.password) });
-      }
-    } else {
-      let migrated = false;
-      for (const s of subjects) {
-        if (s.password !== undefined) {
-          s.passwordHash = s.password ? await sha256(s.password) : null;
-          delete s.password;
-          migrated = true;
+  /* ============ BAŞLANGIÇ ============ */
+  window.addEventListener('DOMContentLoaded', async () => {
+    // Oturumu sessionStorage'dan geri yükle
+    const saved = sessionStorage.getItem('sts_user');
+    if (saved) {
+      try {
+        currentUser = JSON.parse(saved);
+        // 30 dakika geçtiyse oturumu düşür
+        if (Date.now() - currentUser.loginAt > 30 * 60 * 1000) {
+          sessionStorage.removeItem('sts_user');
+          currentUser = null;
         }
-      }
-      if (migrated) console.log('Eski şifreler hash\'lendi.');
+      } catch(e) { currentUser = null; }
     }
-    if (!adminHash) {
-      adminHash = await sha256(ADMIN_PASSWORD_DEFAULT);
-      localStorage.setItem(KEY_ADMIN, adminHash);
+
+    if (currentUser) {
+      await startApp();
+    } else {
+      document.getElementById('loginScreen').style.display = 'flex';
     }
-    if (!excelHash) {
-      excelHash = await sha256(EXCEL_PASSWORD_DEFAULT);
-      localStorage.setItem(KEY_EXCEL, excelHash);
-    }
-    saveLocal();
 
     document.getElementById('entryDate').valueAsDate = new Date();
-    resetCounts();
+  });
+
+  /* ============ GİRİŞ ============ */
+  async function doLogin() {
+    const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+    const password = document.getElementById('loginPassword').value;
+    const errEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
+
+    errEl.classList.remove('show');
+
+    if (!username || !password) {
+      errEl.textContent = '⚠️ Kullanıcı adı ve şifre gerekli';
+      errEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Kontrol ediliyor...';
+
+    try {
+      // Supabase'de verify_login fonksiyonunu çağır
+      const { data, error } = await sb.rpc('verify_login', {
+        p_username: username,
+        p_password: password
+      });
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        errEl.textContent = '❌ Kullanıcı adı veya şifre hatalı';
+        errEl.classList.add('show');
+        return;
+      }
+
+      const u = data[0];
+      currentUser = {
+        id: u.id,
+        username: u.username,
+        display: u.display_name,
+        role: u.role,
+        loginAt: Date.now()
+      };
+      sessionStorage.setItem('sts_user', JSON.stringify(currentUser));
+
+      await startApp();
+    } catch (e) {
+      console.error(e);
+      errEl.textContent = '❌ Bağlantı hatası: ' + (e.message || 'Bilinmeyen hata');
+      errEl.classList.add('show');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔓 Giriş Yap';
+    }
+  }
+
+  function doLogout() {
+    if (!confirm('Çıkış yapmak istediğinize emin misiniz?')) return;
+    sessionStorage.removeItem('sts_user');
+    location.reload();
+  }
+
+  /* ============ UYGULAMA BAŞLAT ============ */
+  async function startApp() {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').classList.add('active');
+    document.getElementById('currentUser').textContent =
+      currentUser.display || currentUser.username;
+
+    // Öğrenci listesi — sabit, koddan geliyor
+    students = parseStudents(DEFAULT_STUDENTS_RAW);
+
+    // Dersleri Supabase'den çek
+    await loadSubjects();
+
+    // Kayıtları Supabase'den çek
+    await refreshRecords();
+
+    // UI render
     renderStudentDropdown();
     renderSubjectsGrid();
-    renderTable();
     updateStudentLock();
-
     startUnlockTimer();
+
+    // Realtime: kayıt değişikliklerini dinle
+    subscribeRealtime();
   }
 
   function parseStudents(raw) {
@@ -869,13 +1028,96 @@
     });
   }
 
-  function saveLocal() {
-    localStorage.setItem(KEY_STUDENTS, JSON.stringify(students));
-    localStorage.setItem(KEY_SUBJECTS, JSON.stringify(subjects));
-    localStorage.setItem(KEY_RECORDS, JSON.stringify(records));
+  /* ============ SUPABASE: DERSLER ============ */
+  async function loadSubjects() {
+    const { data, error } = await sb.from('subjects').select('name').order('id');
+    if (error) {
+      console.error('Ders yükleme hatası:', error);
+      subjects = [];
+      return;
+    }
+    subjects = data.map(s => ({ name: s.name }));
+    resetCounts();
   }
 
-  /* ============ OTOMATİK KİLİT + SAYI SIFIRLAMA ============ */
+  /* ============ SUPABASE: KAYITLAR ============ */
+  async function refreshRecords() {
+    setSyncStatus('syncing');
+    // Sadece kendi kayıtlarımı çek (RLS zaten filtreler ama garanti olsun)
+    const { data, error } = await sb
+      .from('records')
+      .select('*')
+      .eq('teacher_id', currentUser.id)
+      .order('date', { ascending: false })
+      .order('student_no', { ascending: true });
+
+    if (error) {
+      console.error('Kayıt yükleme hatası:', error);
+      setSyncStatus('offline');
+      return;
+    }
+
+    records = data.map(r => ({
+      id: r.id,
+      date: r.date,
+      studentId: null, // Supabase'de yok
+      studentNo: r.student_no,
+      studentName: r.student_name,
+      counts: r.counts || {},
+      createdAt: new Date(r.created_at).getTime()
+    }));
+
+    setSyncStatus('online');
+    renderTable();
+  }
+
+  function setSyncStatus(status) {
+    const el = document.getElementById('syncBadge');
+    if (!el) return;
+    if (status === 'online') {
+      el.textContent = '☁️ Bağlı';
+      el.className = 'sync-badge';
+    } else if (status === 'syncing') {
+      el.textContent = '⏳ Kaydediliyor...';
+      el.className = 'sync-badge syncing';
+    } else {
+      el.textContent = '⚠️ Çevrimdışı';
+      el.className = 'sync-badge offline';
+    }
+  }
+
+  /* ============ REALTIME ============ */
+  let realtimeChannel = null;
+  function subscribeRealtime() {
+    if (realtimeChannel) sb.removeChannel(realtimeChannel);
+
+    realtimeChannel = sb
+      .channel('records-changes')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'records', filter: `teacher_id=eq.${currentUser.id}` },
+        (payload) => {
+          console.log('Realtime update:', payload);
+          refreshRecords();
+        })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') console.log('Realtime bağlandı');
+      });
+  }
+
+  /* ============ DERS ŞİFRE DOĞRULAMA ============ */
+  async function verifySubjectPassword(subjectName, password) {
+    const { data, error } = await sb.rpc('verify_subject_password', {
+      p_subject: subjectName,
+      p_password: password
+    });
+    if (error) {
+      console.error('Şifre doğrulama hatası:', error);
+      return false;
+    }
+    return !!data;
+  }
+
+  /* ============ OTOMATİK KİLİT ============ */
   function startUnlockTimer() {
     if (unlockTimerInterval) clearInterval(unlockTimerInterval);
     unlockTimerInterval = setInterval(() => {
@@ -886,11 +1128,9 @@
       Object.keys(unlockedSubjects).forEach(name => {
         const elapsed = now - unlockedSubjects[name];
         if (elapsed >= UNLOCK_DURATION) {
-          // ⏱️ SÜRE DOLDU
           delete unlockedSubjects[name];
           changed = true;
 
-          // ⭐ SAYIYI SIFIRLA
           if ((currentCounts[name] || 0) > 0) {
             currentCounts[name] = 0;
             totalChanged = true;
@@ -902,16 +1142,9 @@
       });
 
       updateUnlockUI();
-
       if (changed) {
-        // UI'ı yenile
         if (totalChanged) {
-          // Sadece ilgili kartları güncelle
-          subjects.forEach(s => {
-            if (document.getElementById('card-' + s.name)) {
-              updateSubjectUI(s.name);
-            }
-          });
+          subjects.forEach(s => updateSubjectUI(s.name));
         } else {
           renderSubjectsGrid();
         }
@@ -927,8 +1160,7 @@
     if (names.length === 0) {
       bar.classList.remove('show');
     } else {
-      let nearest = null;
-      let minRemain = Infinity;
+      let nearest = null, minRemain = Infinity;
       names.forEach(n => {
         const remain = UNLOCK_DURATION - (Date.now() - unlockedSubjects[n]);
         if (remain < minRemain) { minRemain = remain; nearest = n; }
@@ -942,7 +1174,6 @@
       bar.classList.add('show');
     }
 
-    // Her ders kartı için sayaçları güncelle
     subjects.forEach(s => {
       const card = document.getElementById('card-' + s.name);
       if (!card) return;
@@ -972,27 +1203,14 @@
   }
 
   function isSubjectUnlocked(name) { return !!unlockedSubjects[name]; }
-
   function unlockSubject(name) {
     unlockedSubjects[name] = Date.now();
     updateUnlockUI();
     updateStudentLock();
   }
 
-  function lockSubject(name) {
-    delete unlockedSubjects[name];
-    // ⭐ Kilitleyince sayıyı da sıfırla
-    if ((currentCounts[name] || 0) > 0) {
-      currentCounts[name] = 0;
-      updateSubjectUI(name);
-    }
-    updateUnlockUI();
-    updateStudentLock();
-  }
-
   /* ============ ÖĞRENCİ KİLİDİ ============ */
   function updateStudentLock() {
-    // En az bir ders açıksa öğrenci seçilebilir
     const anyUnlocked = Object.keys(unlockedSubjects).length > 0;
     const sel = document.getElementById('entryStudent');
     const overlay = document.getElementById('studentLockOverlay');
@@ -1028,12 +1246,16 @@
 
   function renderSubjectsGrid() {
     const grid = document.getElementById('subjectsGrid');
+    if (subjects.length === 0) {
+      grid.innerHTML = '<div style="text-align:center; color:#999; padding:20px; grid-column:1/-1;">Ders yükleniyor...</div>';
+      return;
+    }
     grid.innerHTML = subjects.map(subj => {
       const v = currentCounts[subj.name] || 0;
       const filled = v > 0 ? 'filled' : '';
       const unlocked = isSubjectUnlocked(subj.name);
       const unlockCls = unlocked ? 'unlocked' : '';
-      const icon = subj.passwordHash ? (unlocked ? '🔓' : '🔒') : '';
+      const icon = unlocked ? '🔓' : '🔒';
       return `
         <div class="subject-input-card ${filled} ${unlockCls}" id="card-${escapeAttr(subj.name)}">
           <div class="subject-title">
@@ -1052,26 +1274,19 @@
   }
 
   function incCount(subj) {
-    const subject = subjects.find(s => s.name === subj);
-    if (!subject) return;
-
-    if (subject.passwordHash && !isSubjectUnlocked(subj)) {
+    if (!isSubjectUnlocked(subj)) {
       askSubjectPassword(subj, () => {
         currentCounts[subj] = (currentCounts[subj] || 0) + 1;
         updateSubjectUI(subj);
       });
       return;
     }
-
     currentCounts[subj] = (currentCounts[subj] || 0) + 1;
     updateSubjectUI(subj);
   }
 
   function decCount(subj) {
-    const subject = subjects.find(s => s.name === subj);
-    if (!subject) return;
-
-    if (subject.passwordHash && !isSubjectUnlocked(subj)) {
+    if (!isSubjectUnlocked(subj)) {
       askSubjectPassword(subj, () => {
         if ((currentCounts[subj] || 0) <= 0) return;
         currentCounts[subj] -= 1;
@@ -1079,7 +1294,6 @@
       });
       return;
     }
-
     if ((currentCounts[subj] || 0) <= 0) return;
     currentCounts[subj] -= 1;
     updateSubjectUI(subj);
@@ -1140,18 +1354,8 @@
     const { subjectName, callback } = pendingSubjectAction;
     const entered = document.getElementById('spInput').value;
 
-    const subject = subjects.find(s => s.name === subjectName);
-    if (!subject) { closeModal('subjectPasswordModal'); return; }
-
-    if (!subject.passwordHash) {
-      closeModal('subjectPasswordModal');
-      pendingSubjectAction = null;
-      if (callback) callback();
-      return;
-    }
-
-    const h = await sha256(entered);
-    if (h === subject.passwordHash) {
+    const ok = await verifySubjectPassword(subjectName, entered);
+    if (ok) {
       unlockSubject(subjectName);
       closeModal('subjectPasswordModal');
       pendingSubjectAction = null;
@@ -1204,10 +1408,10 @@
 
   async function submitAdminPassword() {
     const entered = document.getElementById('apInput').value;
-    const h = await sha256(entered);
 
     if (pendingExcelAction) {
-      if (h === excelHash) {
+      // Excel şifresi — sabit
+      if (entered === 'excel123') {
         pendingExcelAction = false;
         closeModal('adminPasswordModal');
         doExportExcel();
@@ -1221,7 +1425,13 @@
       return;
     }
 
-    if (h === adminHash) {
+    // Yönetici şifresi — admin kullanıcısı ile doğrula
+    const { data, error } = await sb.rpc('verify_login', {
+      p_username: 'admin',
+      p_password: entered
+    });
+
+    if (!error && data && data.length > 0) {
       const cb = pendingAdminAction;
       pendingAdminAction = null;
       closeModal('adminPasswordModal');
@@ -1235,62 +1445,77 @@
     }
   }
 
-  /* ============ KAYIT ============ */
-  function saveRecord() {
+  /* ============ KAYIT (SUPABASE) ============ */
+  async function saveRecord() {
     const date = document.getElementById('entryDate').value;
     const studentId = document.getElementById('entryStudent').value;
 
     if (!date) { alert('Lütfen tarih seçin.'); return; }
-
-    // ⭐ Öğrenci kilidi kontrolü
     if (Object.keys(unlockedSubjects).length === 0) {
       alert('🔒 Önce bir ders şifresi girmelisiniz. Ders kartlarındaki + butonuna basın.');
       return;
     }
-
     if (!studentId) { alert('Lütfen öğrenci seçin.'); return; }
 
     const student = students.find(s => s.id == studentId);
     if (!student) return;
 
-    const existingIdx = records.findIndex(r =>
-      r.date === date && r.studentId === student.id && r.id !== currentEditingId
-    );
+    setSyncStatus('syncing');
 
-    if (existingIdx >= 0 && !currentEditingId) {
-      const ex = records[existingIdx];
-      subjects.forEach(subj => {
-        ex.counts[subj.name] = (ex.counts[subj.name] || 0) + (currentCounts[subj.name] || 0);
-      });
-      ex.updatedAt = Date.now();
-      showToast(`➕ ${student.name} • ${formatDate(date)} kaydı güncellendi`, 'info');
-    } else if (currentEditingId) {
-      const idx = records.findIndex(r => r.id === currentEditingId);
-      if (idx >= 0) {
-        records[idx].date = date;
-        records[idx].studentId = student.id;
-        records[idx].studentNo = student.no;
-        records[idx].studentName = student.name;
-        records[idx].counts = { ...currentCounts };
-        records[idx].updatedAt = Date.now();
-      }
-      showToast('✏️ Kayıt güncellendi', 'success');
-    } else {
-      records.push({
-        id: Date.now(),
-        date,
-        studentId: student.id,
-        studentNo: student.no,
-        studentName: student.name,
-        counts: { ...currentCounts },
-        createdAt: Date.now()
-      });
-      showToast(`✅ ${student.name} • ${formatDate(date)} kaydedildi`, 'success');
+    // Aynı gün aynı öğrenci var mı? (Supabase'de unique constraint var)
+    const { data: existing, error: findErr } = await sb
+      .from('records')
+      .select('*')
+      .eq('teacher_id', currentUser.id)
+      .eq('date', date)
+      .eq('student_name', student.name)
+      .maybeSingle();
+
+    if (findErr && findErr.code !== 'PGRST116') {
+      console.error(findErr);
+      setSyncStatus('offline');
+      alert('Kayıt kontrolü hatası: ' + findErr.message);
+      return;
     }
 
-    saveLocal();
-    resetForm();
-    renderTable();
+    try {
+      if (existing) {
+        // Üzerine ekle
+        const merged = { ...existing.counts };
+        subjects.forEach(subj => {
+          merged[subj.name] = (merged[subj.name] || 0) + (currentCounts[subj.name] || 0);
+        });
+
+        const { error } = await sb
+          .from('records')
+          .update({ counts: merged, updated_at: new Date().toISOString() })
+          .eq('id', existing.id);
+
+        if (error) throw error;
+        showToast(`➕ ${student.name} • ${formatDate(date)} güncellendi`, 'info');
+      } else {
+        // Yeni kayıt
+        const { error } = await sb.from('records').insert({
+          teacher_id: currentUser.id,
+          teacher_name: currentUser.display || currentUser.username,
+          date,
+          student_no: student.no,
+          student_name: student.name,
+          counts: { ...currentCounts }
+        });
+
+        if (error) throw error;
+        showToast(`✅ ${student.name} • ${formatDate(date)} kaydedildi`, 'success');
+      }
+
+      setSyncStatus('online');
+      resetForm();
+      await refreshRecords();
+    } catch (e) {
+      console.error(e);
+      setSyncStatus('offline');
+      alert('Kayıt hatası: ' + e.message);
+    }
   }
 
   /* ============ TABLO ============ */
@@ -1320,12 +1545,7 @@
       </tr>
     `;
 
-    const sorted = [...records].sort((a, b) => {
-      if (a.date !== b.date) return b.date.localeCompare(a.date);
-      return (parseInt(a.studentNo) || 0) - (parseInt(b.studentNo) || 0);
-    });
-
-    body.innerHTML = sorted.map(r => {
+    body.innerHTML = records.map(r => {
       let total = 0;
       const cells = subjects.map(subj => {
         const v = r.counts[subj.name] || 0;
@@ -1346,150 +1566,86 @@
           ${cells}
           <td class="col-total"><span style="background:#4a3f8a;color:#fff;padding:5px 14px;border-radius:12px;font-weight:700;">${total}</span></td>
           <td class="row-actions">
-            <button class="btn-secondary" onclick="editRecord(${r.id})">✏️</button>
-            <button class="btn-danger" onclick="deleteRecord(${r.id})">🗑️</button>
+            <button class="btn-danger" onclick="deleteRecord('${r.id}')">🗑️</button>
           </td>
         </tr>
       `;
     }).join('');
   }
 
-  function editRecord(id) {
-    const r = records.find(x => x.id === id);
-    if (!r) return;
-    document.getElementById('entryDate').value = r.date;
-    currentCounts = {};
-    subjects.forEach(subj => currentCounts[subj.name] = r.counts[subj.name] || 0);
-    renderSubjectsGrid();
-    currentEditingId = id;
-    document.getElementById('saveBtn').textContent = '💾 Güncelle';
-    // Öğrenci seçimini yap
-    document.getElementById('entryStudent').value = r.studentId;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function deleteRecord(id) {
+  async function deleteRecord(id) {
     if (!confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
-    records = records.filter(r => r.id !== id);
-    saveLocal();
-    renderTable();
-  }
-
-  function clearAllRecords() {
-    if (records.length === 0) return;
-    askAdminPassword('Tüm kayıtları silmek için yönetici şifresi gerekli.', () => {
-      if (!confirm(records.length + ' kayıt silinecek. Emin misiniz?')) return;
-      records = [];
-      saveLocal();
-      renderTable();
-      showToast('🗑️ Tüm kayıtlar silindi', 'info');
-    });
-  }
-
-  /* ============ ÖĞRENCİ / DERS MODAL ============ */
-  function openStudentsModal() {
-    askAdminPassword('Öğrenci listesini düzenlemek için yönetici şifresi gerekli.', () => {
-      const text = [...students]
-        .sort((a,b) => (parseInt(a.no) || 0) - (parseInt(b.no) || 0))
-        .map(s => (s.no ? s.no + ', ' : '') + s.name)
-        .join('\n');
-      document.getElementById('studentsTextarea').value = text;
-      document.getElementById('studentsModal').classList.add('active');
-    });
-  }
-
-  function saveStudents() {
-    const lines = document.getElementById('studentsTextarea').value.split('\n');
-    const newStudents = [];
-    const seen = new Set();
-    let autoId = 100000;
-
-    lines.forEach(line => {
-      const t = line.trim();
-      if (!t) return;
-      const parts = t.split(',').map(p => p.trim()).filter(Boolean);
-      let no = '', name = '';
-      if (parts.length === 1) {
-        const m = parts[0].match(/^(\d+)\s*[-–]\s*(.+)$/);
-        if (m) { no = m[1]; name = m[2]; } else { name = parts[0]; }
-      } else {
-        if (/^\d+$/.test(parts[0])) { no = parts[0]; name = parts[1]; }
-        else { name = parts[0]; }
-      }
-      if (!name) return;
-      const key = (no + '|' + name).toLowerCase();
-      if (seen.has(key)) return;
-      seen.add(key);
-      const existing = students.find(s =>
-        (no && s.no === no) || s.name.toLowerCase() === name.toLowerCase()
-      );
-      newStudents.push({ id: existing ? existing.id : autoId++, no, name });
-    });
-
-    if (newStudents.length === 0) { alert('En az bir öğrenci girmelisiniz.'); return; }
-    students = newStudents;
-    saveLocal();
-    closeModal('studentsModal');
-    renderStudentDropdown();
-    showToast('✅ Öğrenci listesi güncellendi', 'success');
-  }
-
-  function openSubjectsModal() {
-    askAdminPassword('Ders listesini ve şifreleri düzenlemek için yönetici şifresi gerekli.', () => {
-      document.getElementById('subjectsTextarea').value = subjects.map(s => s.name).join('\n');
-      document.getElementById('subjectsModal').classList.add('active');
-    });
-  }
-
-  async function saveSubjects() {
-    const lines = document.getElementById('subjectsTextarea').value.split('\n');
-    const newSubjects = [];
-    const seen = new Set();
-
-    for (const line of lines) {
-      const t = line.trim();
-      if (!t) continue;
-      const parts = t.split(',').map(p => p.trim());
-      const name = parts[0].toLowerCase();
-      const password = parts[1] || '';
-      if (!name) continue;
-      if (seen.has(name)) continue;
-      seen.add(name);
-
-      const existing = subjects.find(s => s.name === name);
-      let passwordHash;
-      if (password) {
-        passwordHash = await sha256(password);
-      } else if (existing && existing.passwordHash) {
-        passwordHash = existing.passwordHash;
-      } else {
-        passwordHash = null;
-      }
-
-      newSubjects.push({ name, passwordHash });
+    setSyncStatus('syncing');
+    const { error } = await sb.from('records').delete().eq('id', id);
+    if (error) {
+      console.error(error);
+      setSyncStatus('offline');
+      alert('Silme hatası: ' + error.message);
+      return;
     }
+    setSyncStatus('online');
+    showToast('🗑️ Kayıt silindi', 'info');
+    await refreshRecords();
+  }
 
-    if (newSubjects.length === 0) { alert('En az bir ders girmelisiniz.'); return; }
-
-    Object.keys(unlockedSubjects).forEach(k => {
-      if (!newSubjects.find(s => s.name === k)) delete unlockedSubjects[k];
+  function clearMyRecords() {
+    if (records.length === 0) return;
+    askAdminPassword('Tüm kendi kayıtlarınızı silmek için yönetici şifresi gerekli.', async () => {
+      if (!confirm(records.length + ' kayıt silinecek. Emin misiniz?')) return;
+      setSyncStatus('syncing');
+      const { error } = await sb.from('records').delete().eq('teacher_id', currentUser.id);
+      if (error) {
+        console.error(error);
+        setSyncStatus('offline');
+        alert('Silme hatası: ' + error.message);
+        return;
+      }
+      setSyncStatus('online');
+      showToast('🗑️ Tüm kayıtlarınız silindi', 'info');
+      await refreshRecords();
     });
+  }
 
-    subjects = newSubjects;
-    saveLocal();
-    closeModal('subjectsModal');
-    resetCounts();
-    renderSubjectsGrid();
-    renderTable();
-    updateStudentLock();
-    showToast('✅ Dersler ve şifreler kaydedildi', 'success');
+  /* ============ YARDIMCI ============ */
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    if (id === 'subjectPasswordModal') pendingSubjectAction = null;
+    if (id === 'adminPasswordModal') { pendingAdminAction = null; pendingExcelAction = false; }
+  }
+  function formatDate(iso) {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-');
+    return `${parseInt(d)}.${parseInt(m)}.${y}`;
+  }
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    })[c]);
+  }
+  function escapeAttr(s) { return String(s ?? '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
+  /* ============ TOAST ============ */
+  let toastTimer = null;
+  function showToast(message, type = 'info') {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'toast';
+      document.body.appendChild(toast);
+    }
+    toast.className = 'toast ' + type;
+    toast.textContent = message;
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
   }
 
   /* ============ EXCEL ============ */
   function doExportExcel() {
     if (records.length === 0) { alert('Dışa aktarılacak kayıt yok.'); return; }
     const rows = [['Tarih', 'No', 'İsim', ...subjects.map(s => s.name), 'Toplam']];
-    [...records].sort((a, b) => b.date.localeCompare(a.date)).forEach(r => {
+    records.forEach(r => {
       let total = 0;
       const row = [r.date, r.studentNo || '', r.studentName];
       subjects.forEach(subj => {
@@ -1512,49 +1668,44 @@
     showToast('📥 Excel indirildi', 'success');
   }
 
-  /* ============ TOAST ============ */
-  let toastTimer = null;
-  function showToast(message, type = 'info') {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'toast';
-      document.body.appendChild(toast);
-    }
-    toast.className = 'toast ' + type;
-    toast.textContent = message;
-    void toast.offsetWidth;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+  /* ============ ÖĞRENCİ / DERS MODAL ============ */
+  function openStudentsModal() {
+    askAdminPassword('Öğrenci listesini görüntülemek için yönetici şifresi gerekli.', () => {
+      const text = [...students]
+        .sort((a,b) => (parseInt(a.no) || 0) - (parseInt(b.no) || 0))
+        .map(s => (s.no ? s.no + ', ' : '') + s.name)
+        .join('\n');
+      document.getElementById('studentsTextarea').value = text;
+      document.getElementById('studentsModal').classList.add('active');
+    });
   }
 
-  /* ============ YARDIMCI ============ */
-  function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-    if (id === 'subjectPasswordModal') pendingSubjectAction = null;
-    if (id === 'adminPasswordModal') { pendingAdminAction = null; pendingExcelAction = false; }
+  function saveStudents() {
+    // Öğrenci listesi kod içinde sabit — sadece gösterim için
+    alert('Öğrenci listesi kod içinde sabittir. Değiştirmek için HTML dosyasındaki DEFAULT_STUDENTS_RAW değişkenini düzenleyin.');
+    closeModal('studentsModal');
   }
-  function formatDate(iso) {
-    if (!iso) return '';
-    const [y, m, d] = iso.split('-');
-    return `${parseInt(d)}.${parseInt(m)}.${y}`;
-  }
-  function escapeHtml(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    })[c]);
-  }
-  function escapeAttr(s) { return String(s ?? '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
+  function openSubjectsModal() {
+    askAdminPassword('Ders listesini ve şifreleri düzenlemek için yönetici şifresi gerekli.', () => {
+      document.getElementById('subjectsTextarea').value = subjects.map(s => s.name).join('\n');
+      document.getElementById('subjectsModal').classList.add('active');
+    });
+  }
+
+  async function saveSubjects() {
+    alert('Ders listesi Supabase üzerinden yönetilir. Yeni ders eklemek için SQL Editor kullanın:\n\n' +
+          "insert into subjects (name, password_hash) values ('yeni_ders', crypt('yeniSifre', gen_salt('bf', 10)));");
+    closeModal('subjectsModal');
+  }
+
+  /* ============ MODAL KAPATMA ============ */
   document.querySelectorAll('.modal-overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id));
   });
-
-  init();
 </script>
 </body>
 </html>
