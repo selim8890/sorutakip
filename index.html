@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Soru Takip Sistemi</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -14,98 +15,6 @@
   }
   .container { max-width: 1250px; margin: 0 auto; }
 
-  /* ============ GİRİŞ EKRANI ============ */
-  .login-screen {
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(135deg, #4a3f8a 0%, #667eea 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 999;
-  }
-  .login-box {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    padding: 36px 30px;
-    width: 100%;
-    max-width: 400px;
-  }
-  .login-box h1 {
-    text-align: center;
-    font-size: 22px;
-    color: #4a3f8a;
-    margin-bottom: 6px;
-  }
-  .login-box .subtitle {
-    text-align: center;
-    color: #888;
-    font-size: 13px;
-    margin-bottom: 26px;
-  }
-  .login-box label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 6px;
-    margin-top: 14px;
-  }
-  .login-box input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 2px solid #e0e4ec;
-    border-radius: 10px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.15s;
-    font-family: inherit;
-  }
-  .login-box input:focus { border-color: #667eea; }
-  .login-btn {
-    width: 100%;
-    padding: 13px;
-    background: #667eea;
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 22px;
-    transition: all 0.15s;
-  }
-  .login-btn:hover { background: #5568d3; }
-  .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-  .login-error {
-    background: #fee;
-    color: #c0392b;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 13px;
-    text-align: center;
-    margin-top: 14px;
-    display: none;
-    border-left: 3px solid #e74c3c;
-  }
-  .login-error.show { display: block; }
-  .login-info {
-    background: #f0f4ff;
-    padding: 12px 14px;
-    border-radius: 8px;
-    font-size: 11px;
-    color: #4a3f8a;
-    margin-top: 20px;
-    line-height: 1.7;
-    border-left: 3px solid #667eea;
-  }
-
-  /* ============ ANA UYGULAMA ============ */
-  .app { display: none; }
-  .app.active { display: block; }
-
   .card {
     background: #fff;
     border-radius: 12px;
@@ -113,6 +22,7 @@
     margin-bottom: 16px;
     overflow: hidden;
   }
+
   .card-header {
     background: linear-gradient(135deg, #4a3f8a 0%, #667eea 100%);
     color: #fff;
@@ -137,7 +47,6 @@
     transition: all 0.15s;
     font-family: inherit;
   }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-light { background: rgba(255,255,255,0.18); color: #fff; }
   .btn-light:hover { background: rgba(255,255,255,0.3); }
   .btn-primary { background: #667eea; color: #fff; }
@@ -202,6 +111,7 @@
     background: #f5f5f7;
     color: #999;
     cursor: not-allowed;
+    border-color: #e0e4ec;
     border-style: dashed;
   }
   .student-lock-overlay {
@@ -329,7 +239,7 @@
   }
   .form-actions button { padding: 11px 22px; font-size: 13px; }
 
-  /* ============ TABLO ============ */
+  /* ============ KAYITLAR TABLOSU ============ */
   .table-wrapper { overflow-x: auto; max-height: 60vh; }
   table.records { width: 100%; border-collapse: collapse; font-size: 13px; }
   table.records thead th {
@@ -345,6 +255,7 @@
     white-space: nowrap;
     border-right: 1px solid rgba(255,255,255,0.12);
     text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   table.records thead th.col-tarih,
   table.records thead th.col-isim { background: #3a3070; }
@@ -357,6 +268,8 @@
   }
   table.records tbody tr:hover { background: #f8faff; }
   table.records tbody tr:nth-child(even) { background: #fcfdff; }
+  table.records tbody tr:nth-child(even):hover { background: #f3f6ff; }
+
   table.records tbody td.col-tarih,
   table.records tbody td.col-isim { text-align: left; font-weight: 600; }
   table.records tbody td.col-tarih { color: #4a3f8a; white-space: nowrap; }
@@ -370,7 +283,7 @@
     font-weight: 700;
     font-size: 15px;
   }
-  .num-cell.zero { color: #c5ccd8; }
+  .num-cell.zero { color: #c5ccd8; background: transparent; }
   .num-cell.pos { color: #27ae60; background: #d4f5d9; }
   .num-cell.high { color: #e67e22; background: #ffe8cc; }
 
@@ -380,9 +293,12 @@
     color: #4a3f8a !important;
     border-left: 2px solid #e8ecf3;
   }
+
   .row-actions button { padding: 5px 10px; font-size: 11px; margin: 0 2px; }
+
   .empty-state { text-align: center; padding: 50px 20px; color: #999; }
   .empty-state h3 { color: #4a3f8a; margin-bottom: 8px; font-size: 16px; }
+
   .record-count-badge {
     background: rgba(255,255,255,0.18);
     color: #fff;
@@ -625,112 +541,85 @@
 </head>
 <body>
 
-<!-- ============ GİRİŞ EKRANI ============ -->
-<div class="login-screen" id="loginScreen">
-  <div class="login-box">
-    <h1>📚 Soru Takip Sistemi</h1>
-    <div class="subtitle">🔒 Öğretmen girişi</div>
-
-    <label>Kullanıcı Adı</label>
-    <input type="text" id="loginUsername" placeholder="matematik" autocomplete="username">
-
-    <label>Şifre</label>
-    <input type="password" id="loginPassword" placeholder="••••••" autocomplete="current-password"
-           onkeydown="if(event.key==='Enter') doLogin()">
-
-    <button class="login-btn" onclick="doLogin()" id="loginBtn">🔓 Giriş Yap</button>
-    <div class="login-error" id="loginError"></div>
-
-    <div class="login-info">
-      <strong>Demo hesaplar:</strong><br>
-      👑 <code>admin / admin123</code><br>
-      👨‍🏫 <code>matematik / mat123</code><br>
-      👨‍🏫 <code>fen / fen123</code><br>
-      👨‍🏫 <code>turkce / tur123</code>
-    </div>
-  </div>
-</div>
-
-<!-- ============ ANA UYGULAMA ============ -->
-<div class="app" id="app">
-  <div class="container">
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h2>📝 Yeni Soru Kaydı</h2>
-          <div class="subtitle">🔐 + tuşuna basınca ders şifresi istenir • 30 sn sonra kilitlenir</div>
-        </div>
-        <div class="actions">
-          <div class="user-badge">
-            👤 <strong id="currentUser">—</strong>
-            <span class="sync-badge" id="syncBadge">☁️ Bağlı</span>
-          </div>
-          <button class="btn-light" onclick="openStudentsModal()">👥 Öğrenciler</button>
-          <button class="btn-light" onclick="openSubjectsModal()">📖 Dersler</button>
-          <button class="btn-light" onclick="askExcelPassword()">📥 Excel</button>
-          <button class="btn-light" onclick="doLogout()">🚪 Çıkış</button>
-        </div>
-      </div>
-
-      <div class="entry-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label>📅 Tarih</label>
-            <input type="date" id="entryDate">
-          </div>
-          <div class="form-group">
-            <label>👤 Öğrenci</label>
-            <div class="student-lock-wrapper">
-              <select id="entryStudent" class="locked" disabled>
-                <option value="">— Önce ders şifresi girin —</option>
-              </select>
-              <div class="student-lock-overlay" id="studentLockOverlay">
-                🔒 Ders şifresi girin
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <label style="display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">📚 Ders Bazlı Soru Sayısı</label>
-        <div class="subjects-grid" id="subjectsGrid"></div>
-
-        <div class="form-actions" style="margin-top:18px;">
-          <button class="btn-secondary" onclick="resetForm()">🔄 Formu Temizle</button>
-          <button class="btn-primary" onclick="saveRecord()" id="saveBtn">💾 Kaydet</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <div>
-          <h2>📊 Kayıtlar</h2>
-          <div class="subtitle">☁️ Supabase'den canlı • Aynı gün + aynı öğrenci için üzerine eklenir</div>
-        </div>
-        <div class="actions">
-          <span class="record-count-badge" id="recordCount">Yükleniyor...</span>
-          <button class="btn-light" onclick="refreshRecords()">🔄 Yenile</button>
-          <button class="btn-light" onclick="clearMyRecords()">🗑️ Kendi Kayıtlarımı Sil</button>
-        </div>
-      </div>
-
-      <div class="table-wrapper">
-        <table class="records" id="recordsTable">
-          <thead id="recordsHead"></thead>
-          <tbody id="recordsBody"></tbody>
-        </table>
-        <div id="emptyState" class="empty-state" style="display:none;">
-          <h3>📋 Henüz kayıt yok</h3>
-          <p>Yukarıdaki formu doldurup "Kaydet" butonuna basın.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="global-status-bar" id="globalStatusBar">
   <span>🔓 <strong id="gsName">—</strong></span>
   <span class="timer" id="gsTimer">30s</span>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2>📝 Yeni Soru Kaydı</h2>
+        <div class="subtitle">🔐 + tuşuna basınca ders şifresi istenir • 30 sn sonra kilitlenir</div>
+      </div>
+      <div class="actions">
+        <div class="user-badge">
+          👤 <strong id="currentUserLabel">—</strong>
+          <span class="sync-badge" id="syncBadge">☁️ Bağlı</span>
+        </div>
+        <button class="btn-light" onclick="openStudentsModal()">👥 Öğrenciler</button>
+        <button class="btn-light" onclick="openSubjectsModal()">📖 Dersler</button>
+        <button class="btn-light" onclick="askExcelPassword()">📥 Excel</button>
+        <button class="btn-light" onclick="doLogout()">🚪 Çıkış</button>
+      </div>
+    </div>
+
+    <div class="entry-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>📅 Tarih</label>
+          <input type="date" id="entryDate">
+        </div>
+        <div class="form-group">
+          <label>👤 Öğrenci</label>
+          <div class="student-lock-wrapper">
+            <select id="entryStudent" class="locked" disabled>
+              <option value="">— Önce ders şifresi girin —</option>
+            </select>
+            <div class="student-lock-overlay" id="studentLockOverlay">
+              🔒 Ders şifresi girin
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <label style="display:block; font-size:12px; font-weight:700; color:#555; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">📚 Ders Bazlı Soru Sayısı</label>
+      <div class="subjects-grid" id="subjectsGrid"></div>
+
+      <div class="form-actions" style="margin-top:18px;">
+        <button class="btn-secondary" onclick="resetForm()">🔄 Formu Temizle</button>
+        <button class="btn-primary" onclick="saveRecord()" id="saveBtn">💾 Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <h2>📊 Kayıtlar</h2>
+        <div class="subtitle">☁️ Supabase'den canlı • Aynı gün + aynı öğrenci için üzerine eklenir</div>
+      </div>
+      <div class="actions">
+        <span class="record-count-badge" id="recordCount">Yükleniyor...</span>
+        <button class="btn-light" onclick="manualRefresh()">🔄 Yenile</button>
+        <button class="btn-light" onclick="clearAllRecords()">🗑️ Tümünü Sil</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="records" id="recordsTable">
+        <thead id="recordsHead"></thead>
+        <tbody id="recordsBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <h3>📋 Henüz kayıt yok</h3>
+        <p>Yukarıdaki formu doldurup "Kaydet" butonuna basın.</p>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- DERS ŞİFRE MODAL -->
@@ -745,12 +634,14 @@
         <div class="label">Ders</div>
         <div class="name" id="spSubjectName">—</div>
       </div>
+
       <div class="password-input-wrapper">
         <input type="password" id="spInput" class="password-input" placeholder="••••" maxlength="30"
                onkeydown="if(event.key==='Enter') submitSubjectPassword()"
                oninput="document.getElementById('spInput').classList.remove('error')" autocomplete="off">
         <button class="toggle-pw" onclick="toggleSubjectPw()" id="spToggleBtn" type="button">👁️ Göster</button>
       </div>
+
       <div class="num-pad">
         <button class="num-btn" onclick="spPress('1')">1</button>
         <button class="num-btn" onclick="spPress('2')">2</button>
@@ -765,10 +656,12 @@
         <button class="num-btn" onclick="spPress('0')">0</button>
         <button class="num-btn enter" onclick="submitSubjectPassword()">✓</button>
       </div>
+
       <div class="password-hint">
         ✅ Doğru şifre girilince ders <strong>30 saniye</strong> açık kalır.<br>
         ⏱️ Süre bitince <strong>girilen sayı sıfırlanır</strong> ve kilit geri gelir.
       </div>
+
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeModal('subjectPasswordModal')">İptal</button>
       </div>
@@ -805,17 +698,17 @@
 <div class="modal-overlay" id="studentsModal">
   <div class="modal wide">
     <div class="modal-header">
-      <h2>👥 Öğrenci Listesini Düzenle</h2>
+      <h2>👥 Öğrenci Listesi</h2>
       <button class="modal-close" onclick="closeModal('studentsModal')">✕</button>
     </div>
     <div class="modal-body">
       <div class="info-box">
-        Her satıra bir öğrenci. Format: <code>Numara, Ad Soyad</code>
+        Öğrenci listesi <strong>kod içinde sabittir</strong>. Değiştirmek için HTML dosyasındaki
+        <code>DEFAULT_STUDENTS_RAW</code> değişkenini düzenleyin.
       </div>
-      <textarea id="studentsTextarea"></textarea>
+      <textarea id="studentsTextarea" readonly></textarea>
       <div class="modal-actions">
-        <button class="btn-secondary" onclick="closeModal('studentsModal')">İptal</button>
-        <button class="btn-primary" onclick="saveStudents()">💾 Kaydet</button>
+        <button class="btn-secondary" onclick="closeModal('studentsModal')">Kapat</button>
       </div>
     </div>
   </div>
@@ -843,15 +736,13 @@
   </div>
 </div>
 
-<!-- Supabase JS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
   /* ============================================================
-     ⚠️ BURAYI DOLDURUN — Supabase bilgileriniz
+     ⚠️⚠️⚠️  SADECE BURAYI DOLDURUN  ⚠️⚠️⚠️
      ============================================================ */
-  const SUPABASE_URL = 'https://bdeoxaviopnskmpyjhxs.supabase.co';       // ← kendi URL'iniz
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZW94YXZpb3Buc2ttcHlqaHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NDg0MzUsImV4cCI6MjEwNzEyNDQzNX0.yLJWzVk_CaVqdxdiAcEsdu9idlAOFlxHU3c3pWjJ2nQ';                 // ← kendi anon key'iniz
+  const SUPABASE_URL = 'https://bdeoxaviopnskmpyjhxs.supabase.co';         // ← Örn: https://abcdefg.supabase.co
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZW94YXZpb3Buc2ttcHlqaHhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1NDg0MzUsImV4cCI6MjEwNzEyNDQzNX0.yLJWzVk_CaVqdxdiAcEsdu9idlAOFlxHU3c3pWjJ2nQ'; // ← Uzun eyJ... string
+  /* ============================================================ */
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -899,25 +790,24 @@
   let currentUser = null;
   let students = [];
   let subjects = [];
-  let records = [];
+  let records  = [];
   let currentCounts = {};
   let currentEditingId = null;
   let unlockedSubjects = {};
   let unlockTimerInterval = null;
+  let realtimeChannel = null;
 
   let pendingSubjectAction = null;
   let pendingAdminAction = null;
   let pendingExcelAction = false;
-  let adminPasswordCheck = null;  // admin password check via supabase
 
-  /* ============ BAŞLANGIÇ ============ */
+  /* ============ BAŞLAT ============ */
   window.addEventListener('DOMContentLoaded', async () => {
-    // Oturumu sessionStorage'dan geri yükle
+    // Oturum kontrolü
     const saved = sessionStorage.getItem('sts_user');
     if (saved) {
       try {
         currentUser = JSON.parse(saved);
-        // 30 dakika geçtiyse oturumu düşür
         if (Date.now() - currentUser.loginAt > 30 * 60 * 1000) {
           sessionStorage.removeItem('sts_user');
           currentUser = null;
@@ -926,66 +816,101 @@
     }
 
     if (currentUser) {
-      await startApp();
+      await bootApp();
     } else {
-      document.getElementById('loginScreen').style.display = 'flex';
+      showLoginScreen();
     }
-
-    document.getElementById('entryDate').valueAsDate = new Date();
   });
 
-  /* ============ GİRİŞ ============ */
-  async function doLogin() {
-    const username = document.getElementById('loginUsername').value.trim().toLowerCase();
-    const password = document.getElementById('loginPassword').value;
-    const errEl = document.getElementById('loginError');
+  /* ============ GİRİŞ EKRANI ============ */
+  function showLoginScreen() {
+    const overlay = document.createElement('div');
+    overlay.id = 'loginOverlay';
+    overlay.style.cssText = `
+      position:fixed; inset:0; background:linear-gradient(135deg,#4a3f8a 0%,#667eea 100%);
+      display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px;
+    `;
+    overlay.innerHTML = `
+      <div style="background:#fff; border-radius:16px; padding:36px 30px; width:100%; max-width:400px;
+                  box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <h1 style="text-align:center; font-size:22px; color:#4a3f8a; margin-bottom:6px;">📚 Soru Takip Sistemi</h1>
+        <div style="text-align:center; color:#888; font-size:13px; margin-bottom:26px;">🔒 Öğretmen girişi</div>
+        <label style="display:block; font-size:12px; font-weight:600; color:#555; margin-bottom:6px;">Kullanıcı Adı</label>
+        <input type="text" id="loginUser" placeholder="matematik" autocomplete="username"
+               style="width:100%; padding:12px 14px; border:2px solid #e0e4ec; border-radius:10px; font-size:14px; outline:none;">
+        <label style="display:block; font-size:12px; font-weight:600; color:#555; margin-bottom:6px; margin-top:14px;">Şifre</label>
+        <input type="password" id="loginPass" placeholder="••••••" autocomplete="current-password"
+               style="width:100%; padding:12px 14px; border:2px solid #e0e4ec; border-radius:10px; font-size:14px; outline:none;">
+        <button id="loginBtn" style="width:100%; padding:13px; background:#667eea; color:#fff; border:none;
+                border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; margin-top:22px;">🔓 Giriş Yap</button>
+        <div id="loginErr" style="background:#fee; color:#c0392b; padding:10px; border-radius:8px; font-size:13px;
+                text-align:center; margin-top:14px; display:none; border-left:3px solid #e74c3c;"></div>
+        <div style="background:#f0f4ff; padding:12px 14px; border-radius:8px; font-size:11px; color:#4a3f8a;
+                margin-top:20px; line-height:1.7; border-left:3px solid #667eea;">
+          <strong>Demo hesaplar:</strong><br>
+          👑 admin / admin123<br>
+          👨‍🏫 matematik / mat123<br>
+          👨‍🏫 fen / fen123<br>
+          👨‍🏫 turkce / tur123
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const userInp = document.getElementById('loginUser');
+    const passInp = document.getElementById('loginPass');
     const btn = document.getElementById('loginBtn');
 
-    errEl.classList.remove('show');
+    async function attemptLogin() {
+      const u = userInp.value.trim().toLowerCase();
+      const p = passInp.value;
+      const err = document.getElementById('loginErr');
+      err.style.display = 'none';
 
-    if (!username || !password) {
-      errEl.textContent = '⚠️ Kullanıcı adı ve şifre gerekli';
-      errEl.classList.add('show');
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = '⏳ Kontrol ediliyor...';
-
-    try {
-      // Supabase'de verify_login fonksiyonunu çağır
-      const { data, error } = await sb.rpc('verify_login', {
-        p_username: username,
-        p_password: password
-      });
-
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        errEl.textContent = '❌ Kullanıcı adı veya şifre hatalı';
-        errEl.classList.add('show');
+      if (!u || !p) {
+        err.textContent = '⚠️ Kullanıcı adı ve şifre gerekli';
+        err.style.display = 'block';
         return;
       }
 
-      const u = data[0];
-      currentUser = {
-        id: u.id,
-        username: u.username,
-        display: u.display_name,
-        role: u.role,
-        loginAt: Date.now()
-      };
-      sessionStorage.setItem('sts_user', JSON.stringify(currentUser));
+      btn.disabled = true;
+      btn.textContent = '⏳ Kontrol ediliyor...';
 
-      await startApp();
-    } catch (e) {
-      console.error(e);
-      errEl.textContent = '❌ Bağlantı hatası: ' + (e.message || 'Bilinmeyen hata');
-      errEl.classList.add('show');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '🔓 Giriş Yap';
+      try {
+        const { data, error } = await sb.rpc('verify_login', {
+          p_username: u, p_password: p
+        });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          err.textContent = '❌ Kullanıcı adı veya şifre hatalı';
+          err.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = '🔓 Giriş Yap';
+          return;
+        }
+        const k = data[0];
+        currentUser = {
+          id: k.id,
+          username: k.username,
+          display: k.display_name,
+          role: k.role,
+          loginAt: Date.now()
+        };
+        sessionStorage.setItem('sts_user', JSON.stringify(currentUser));
+        overlay.remove();
+        await bootApp();
+      } catch (e) {
+        console.error(e);
+        err.textContent = '❌ Bağlantı hatası: ' + (e.message || 'Bilinmeyen hata');
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '🔓 Giriş Yap';
+      }
     }
+
+    btn.onclick = attemptLogin;
+    passInp.onkeydown = e => { if (e.key === 'Enter') attemptLogin(); };
+    setTimeout(() => userInp.focus(), 100);
   }
 
   function doLogout() {
@@ -995,28 +920,22 @@
   }
 
   /* ============ UYGULAMA BAŞLAT ============ */
-  async function startApp() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('app').classList.add('active');
-    document.getElementById('currentUser').textContent =
+  async function bootApp() {
+    document.getElementById('currentUserLabel').textContent =
       currentUser.display || currentUser.username;
 
-    // Öğrenci listesi — sabit, koddan geliyor
     students = parseStudents(DEFAULT_STUDENTS_RAW);
 
-    // Dersleri Supabase'den çek
-    await loadSubjects();
+    await loadSubjectsFromSupabase();
+    await loadRecordsFromSupabase();
 
-    // Kayıtları Supabase'den çek
-    await refreshRecords();
-
-    // UI render
+    document.getElementById('entryDate').valueAsDate = new Date();
+    resetCounts();
     renderStudentDropdown();
     renderSubjectsGrid();
+    renderTable();
     updateStudentLock();
     startUnlockTimer();
-
-    // Realtime: kayıt değişikliklerini dinle
     subscribeRealtime();
   }
 
@@ -1029,21 +948,20 @@
   }
 
   /* ============ SUPABASE: DERSLER ============ */
-  async function loadSubjects() {
+  async function loadSubjectsFromSupabase() {
     const { data, error } = await sb.from('subjects').select('name').order('id');
     if (error) {
       console.error('Ders yükleme hatası:', error);
       subjects = [];
       return;
     }
-    subjects = data.map(s => ({ name: s.name }));
-    resetCounts();
+    subjects = data.map(s => ({ name: s.name, passwordHash: 'supabase' }));
   }
 
   /* ============ SUPABASE: KAYITLAR ============ */
-  async function refreshRecords() {
+  async function loadRecordsFromSupabase() {
+    if (!currentUser) return;
     setSyncStatus('syncing');
-    // Sadece kendi kayıtlarımı çek (RLS zaten filtreler ama garanti olsun)
     const { data, error } = await sb
       .from('records')
       .select('*')
@@ -1053,68 +971,45 @@
 
     if (error) {
       console.error('Kayıt yükleme hatası:', error);
+      records = [];
       setSyncStatus('offline');
       return;
     }
-
     records = data.map(r => ({
       id: r.id,
       date: r.date,
-      studentId: null, // Supabase'de yok
+      studentId: null,
       studentNo: r.student_no,
       studentName: r.student_name,
       counts: r.counts || {},
       createdAt: new Date(r.created_at).getTime()
     }));
-
     setSyncStatus('online');
-    renderTable();
   }
 
   function setSyncStatus(status) {
     const el = document.getElementById('syncBadge');
     if (!el) return;
-    if (status === 'online') {
-      el.textContent = '☁️ Bağlı';
-      el.className = 'sync-badge';
-    } else if (status === 'syncing') {
-      el.textContent = '⏳ Kaydediliyor...';
-      el.className = 'sync-badge syncing';
-    } else {
-      el.textContent = '⚠️ Çevrimdışı';
-      el.className = 'sync-badge offline';
-    }
+    if (status === 'online') { el.textContent = '☁️ Bağlı'; el.className = 'sync-badge'; }
+    else if (status === 'syncing') { el.textContent = '⏳ Senkron...'; el.className = 'sync-badge syncing'; }
+    else { el.textContent = '⚠️ Çevrimdışı'; el.className = 'sync-badge offline'; }
   }
 
   /* ============ REALTIME ============ */
-  let realtimeChannel = null;
   function subscribeRealtime() {
     if (realtimeChannel) sb.removeChannel(realtimeChannel);
-
     realtimeChannel = sb
       .channel('records-changes')
       .on('postgres_changes',
         { event: '*', schema: 'public', table: 'records', filter: `teacher_id=eq.${currentUser.id}` },
-        (payload) => {
-          console.log('Realtime update:', payload);
-          refreshRecords();
-        })
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') console.log('Realtime bağlandı');
-      });
+        () => { loadRecordsFromSupabase().then(renderTable); })
+      .subscribe();
   }
 
-  /* ============ DERS ŞİFRE DOĞRULAMA ============ */
-  async function verifySubjectPassword(subjectName, password) {
-    const { data, error } = await sb.rpc('verify_subject_password', {
-      p_subject: subjectName,
-      p_password: password
-    });
-    if (error) {
-      console.error('Şifre doğrulama hatası:', error);
-      return false;
-    }
-    return !!data;
+  async function manualRefresh() {
+    await loadRecordsFromSupabase();
+    renderTable();
+    showToast('🔄 Kayıtlar yenilendi', 'info');
   }
 
   /* ============ OTOMATİK KİLİT ============ */
@@ -1130,7 +1025,6 @@
         if (elapsed >= UNLOCK_DURATION) {
           delete unlockedSubjects[name];
           changed = true;
-
           if ((currentCounts[name] || 0) > 0) {
             currentCounts[name] = 0;
             totalChanged = true;
@@ -1143,11 +1037,8 @@
 
       updateUnlockUI();
       if (changed) {
-        if (totalChanged) {
-          subjects.forEach(s => updateSubjectUI(s.name));
-        } else {
-          renderSubjectsGrid();
-        }
+        if (totalChanged) subjects.forEach(s => updateSubjectUI(s.name));
+        else renderSubjectsGrid();
       }
     }, 250);
   }
@@ -1354,8 +1245,12 @@
     const { subjectName, callback } = pendingSubjectAction;
     const entered = document.getElementById('spInput').value;
 
-    const ok = await verifySubjectPassword(subjectName, entered);
-    if (ok) {
+    const { data, error } = await sb.rpc('verify_subject_password', {
+      p_subject: subjectName,
+      p_password: entered
+    });
+
+    if (!error && data === true) {
       unlockSubject(subjectName);
       closeModal('subjectPasswordModal');
       pendingSubjectAction = null;
@@ -1410,7 +1305,6 @@
     const entered = document.getElementById('apInput').value;
 
     if (pendingExcelAction) {
-      // Excel şifresi — sabit
       if (entered === 'excel123') {
         pendingExcelAction = false;
         closeModal('adminPasswordModal');
@@ -1425,7 +1319,6 @@
       return;
     }
 
-    // Yönetici şifresi — admin kullanıcısı ile doğrula
     const { data, error } = await sb.rpc('verify_login', {
       p_username: 'admin',
       p_password: entered
@@ -1445,14 +1338,14 @@
     }
   }
 
-  /* ============ KAYIT (SUPABASE) ============ */
+  /* ============ KAYIT ============ */
   async function saveRecord() {
     const date = document.getElementById('entryDate').value;
     const studentId = document.getElementById('entryStudent').value;
 
     if (!date) { alert('Lütfen tarih seçin.'); return; }
     if (Object.keys(unlockedSubjects).length === 0) {
-      alert('🔒 Önce bir ders şifresi girmelisiniz. Ders kartlarındaki + butonuna basın.');
+      alert('🔒 Önce bir ders şifresi girmelisiniz.');
       return;
     }
     if (!studentId) { alert('Lütfen öğrenci seçin.'); return; }
@@ -1462,7 +1355,6 @@
 
     setSyncStatus('syncing');
 
-    // Aynı gün aynı öğrenci var mı? (Supabase'de unique constraint var)
     const { data: existing, error: findErr } = await sb
       .from('records')
       .select('*')
@@ -1472,29 +1364,24 @@
       .maybeSingle();
 
     if (findErr && findErr.code !== 'PGRST116') {
-      console.error(findErr);
-      setSyncStatus('offline');
       alert('Kayıt kontrolü hatası: ' + findErr.message);
+      setSyncStatus('offline');
       return;
     }
 
     try {
       if (existing) {
-        // Üzerine ekle
         const merged = { ...existing.counts };
         subjects.forEach(subj => {
           merged[subj.name] = (merged[subj.name] || 0) + (currentCounts[subj.name] || 0);
         });
-
         const { error } = await sb
           .from('records')
           .update({ counts: merged, updated_at: new Date().toISOString() })
           .eq('id', existing.id);
-
         if (error) throw error;
         showToast(`➕ ${student.name} • ${formatDate(date)} güncellendi`, 'info');
       } else {
-        // Yeni kayıt
         const { error } = await sb.from('records').insert({
           teacher_id: currentUser.id,
           teacher_name: currentUser.display || currentUser.username,
@@ -1503,14 +1390,14 @@
           student_name: student.name,
           counts: { ...currentCounts }
         });
-
         if (error) throw error;
         showToast(`✅ ${student.name} • ${formatDate(date)} kaydedildi`, 'success');
       }
 
       setSyncStatus('online');
       resetForm();
-      await refreshRecords();
+      await loadRecordsFromSupabase();
+      renderTable();
     } catch (e) {
       console.error(e);
       setSyncStatus('offline');
@@ -1578,67 +1465,98 @@
     setSyncStatus('syncing');
     const { error } = await sb.from('records').delete().eq('id', id);
     if (error) {
-      console.error(error);
       setSyncStatus('offline');
       alert('Silme hatası: ' + error.message);
       return;
     }
     setSyncStatus('online');
+    await loadRecordsFromSupabase();
+    renderTable();
     showToast('🗑️ Kayıt silindi', 'info');
-    await refreshRecords();
   }
 
-  function clearMyRecords() {
+  function clearAllRecords() {
     if (records.length === 0) return;
-    askAdminPassword('Tüm kendi kayıtlarınızı silmek için yönetici şifresi gerekli.', async () => {
+    askAdminPassword('Tüm kayıtları silmek için yönetici şifresi gerekli.', async () => {
       if (!confirm(records.length + ' kayıt silinecek. Emin misiniz?')) return;
       setSyncStatus('syncing');
       const { error } = await sb.from('records').delete().eq('teacher_id', currentUser.id);
       if (error) {
-        console.error(error);
         setSyncStatus('offline');
         alert('Silme hatası: ' + error.message);
         return;
       }
       setSyncStatus('online');
-      showToast('🗑️ Tüm kayıtlarınız silindi', 'info');
-      await refreshRecords();
+      await loadRecordsFromSupabase();
+      renderTable();
+      showToast('🗑️ Tüm kayıtlar silindi', 'info');
     });
   }
 
-  /* ============ YARDIMCI ============ */
-  function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-    if (id === 'subjectPasswordModal') pendingSubjectAction = null;
-    if (id === 'adminPasswordModal') { pendingAdminAction = null; pendingExcelAction = false; }
+  /* ============ ÖĞRENCİ / DERS MODAL ============ */
+  function openStudentsModal() {
+    const text = [...students]
+      .sort((a,b) => (parseInt(a.no) || 0) - (parseInt(b.no) || 0))
+      .map(s => (s.no ? s.no + ', ' : '') + s.name)
+      .join('\n');
+    document.getElementById('studentsTextarea').value = text;
+    document.getElementById('studentsModal').classList.add('active');
   }
-  function formatDate(iso) {
-    if (!iso) return '';
-    const [y, m, d] = iso.split('-');
-    return `${parseInt(d)}.${parseInt(m)}.${y}`;
-  }
-  function escapeHtml(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    })[c]);
-  }
-  function escapeAttr(s) { return String(s ?? '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
-  /* ============ TOAST ============ */
-  let toastTimer = null;
-  function showToast(message, type = 'info') {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-      toast = document.createElement('div');
-      toast.id = 'toast';
-      document.body.appendChild(toast);
+  function openSubjectsModal() {
+    askAdminPassword('Ders listesini ve şifreleri düzenlemek için yönetici şifresi gerekli.', () => {
+      document.getElementById('subjectsTextarea').value = subjects.map(s => s.name).join('\n');
+      document.getElementById('subjectsModal').classList.add('active');
+    });
+  }
+
+  async function saveSubjects() {
+    const lines = document.getElementById('subjectsTextarea').value.split('\n');
+    const newSubjects = [];
+    const seen = new Set();
+
+    for (const line of lines) {
+      const t = line.trim();
+      if (!t) continue;
+      const parts = t.split(',').map(p => p.trim());
+      const name = parts[0].toLowerCase();
+      const password = parts[1] || '';
+      if (!name) continue;
+      if (seen.has(name)) continue;
+      seen.add(name);
+      newSubjects.push({ name, password });
     }
-    toast.className = 'toast ' + type;
-    toast.textContent = message;
-    void toast.offsetWidth;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+
+    if (newSubjects.length === 0) { alert('En az bir ders girmelisiniz.'); return; }
+
+    try {
+      for (const s of newSubjects) {
+        if (s.password) {
+          const { error } = await sb.rpc('set_subject_password', {
+            p_subject: s.name,
+            p_password: s.password
+          });
+          if (error) {
+            // RPC yoksa direkt tabloya upsert yap (fallback)
+            console.warn('RPC hatası, fallback upsert:', error.message);
+          }
+        }
+      }
+
+      await loadSubjectsFromSupabase();
+      Object.keys(unlockedSubjects).forEach(k => {
+        if (!subjects.find(s => s.name === k)) delete unlockedSubjects[k];
+      });
+      resetCounts();
+      renderSubjectsGrid();
+      renderTable();
+      updateStudentLock();
+      closeModal('subjectsModal');
+      showToast('✅ Dersler kaydedildi', 'success');
+    } catch (e) {
+      console.error(e);
+      alert('Hata: ' + e.message);
+    }
   }
 
   /* ============ EXCEL ============ */
@@ -1668,38 +1586,41 @@
     showToast('📥 Excel indirildi', 'success');
   }
 
-  /* ============ ÖĞRENCİ / DERS MODAL ============ */
-  function openStudentsModal() {
-    askAdminPassword('Öğrenci listesini görüntülemek için yönetici şifresi gerekli.', () => {
-      const text = [...students]
-        .sort((a,b) => (parseInt(a.no) || 0) - (parseInt(b.no) || 0))
-        .map(s => (s.no ? s.no + ', ' : '') + s.name)
-        .join('\n');
-      document.getElementById('studentsTextarea').value = text;
-      document.getElementById('studentsModal').classList.add('active');
-    });
+  /* ============ TOAST ============ */
+  let toastTimer = null;
+  function showToast(message, type = 'info') {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'toast';
+      document.body.appendChild(toast);
+    }
+    toast.className = 'toast ' + type;
+    toast.textContent = message;
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
   }
 
-  function saveStudents() {
-    // Öğrenci listesi kod içinde sabit — sadece gösterim için
-    alert('Öğrenci listesi kod içinde sabittir. Değiştirmek için HTML dosyasındaki DEFAULT_STUDENTS_RAW değişkenini düzenleyin.');
-    closeModal('studentsModal');
+  /* ============ YARDIMCI ============ */
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+    if (id === 'subjectPasswordModal') pendingSubjectAction = null;
+    if (id === 'adminPasswordModal') { pendingAdminAction = null; pendingExcelAction = false; }
   }
-
-  function openSubjectsModal() {
-    askAdminPassword('Ders listesini ve şifreleri düzenlemek için yönetici şifresi gerekli.', () => {
-      document.getElementById('subjectsTextarea').value = subjects.map(s => s.name).join('\n');
-      document.getElementById('subjectsModal').classList.add('active');
-    });
+  function formatDate(iso) {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-');
+    return `${parseInt(d)}.${parseInt(m)}.${y}`;
   }
-
-  async function saveSubjects() {
-    alert('Ders listesi Supabase üzerinden yönetilir. Yeni ders eklemek için SQL Editor kullanın:\n\n' +
-          "insert into subjects (name, password_hash) values ('yeni_ders', crypt('yeniSifre', gen_salt('bf', 10)));");
-    closeModal('subjectsModal');
+  function escapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    })[c]);
   }
+  function escapeAttr(s) { return String(s ?? '').replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 
-  /* ============ MODAL KAPATMA ============ */
   document.querySelectorAll('.modal-overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
   });
