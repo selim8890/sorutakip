@@ -817,6 +817,9 @@
   /* ============ GİRİŞ EKRANI ============ */
   function showLoginScreen() {
     const overlay = document.createElement('div');
+   function showLoginScreen() {
+  return;  // ⭐ Giriş ekranı devre dışı — bu satırı EKLEYİN
+  const overlay = document.createElement('div');
     overlay.id = 'loginOverlay';
     overlay.style.cssText = `
       position:fixed; inset:0; background:linear-gradient(135deg,#4a3f8a 0%,#667eea 100%);
