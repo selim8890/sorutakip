@@ -802,24 +802,16 @@
   let pendingExcelAction = false;
 
   /* ============ BAŞLAT ============ */
-  window.addEventListener('DOMContentLoaded', async () => {
-    // Oturum kontrolü
-    const saved = sessionStorage.getItem('sts_user');
-    if (saved) {
-      try {
-        currentUser = JSON.parse(saved);
-        if (Date.now() - currentUser.loginAt > 30 * 60 * 1000) {
-          sessionStorage.removeItem('sts_user');
-          currentUser = null;
-        }
-      } catch(e) { currentUser = null; }
-    }
-
-    if (currentUser) {
-      await bootApp();
-    } else {
-      showLoginScreen();
-    }
+   window.addEventListener('DOMContentLoaded', async () => {
+    // 🔓 Giriş ekranı YOK — otomatik olarak admin kullanıcısıyla başla
+    currentUser = {
+      id: 1,                    // Supabase'de admin kullanıcısının id'si
+      username: 'admin',
+      display: 'Yönetici',
+      role: 'admin',
+      loginAt: Date.now()
+    };
+    await bootApp();
   });
 
   /* ============ GİRİŞ EKRANI ============ */
