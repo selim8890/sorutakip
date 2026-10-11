@@ -29,6 +29,22 @@
     --subj-sos: #f59e0b;
     --subj-ing: #8b5cf6;
   }
+    /* ============ ÇİFT DOKUNMA ZOOM ENGELLEME ============ */
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    touch-action: manipulation;
+  }
+  body {
+    touch-action: manipulation;
+  }
+  /* Tüm tıklanabilir öğelerde zoom engellensin */
+  button, a, input, select, textarea,
+  .btn, .counter-btn, .pin-box, .numpad button, .gear-btn,
+  .student-item, .numpad, .modal-close {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html { -webkit-text-size-adjust: 100%; }
   body {
@@ -1119,6 +1135,34 @@
 </div>
 
 <script>
+  /* ============ MOBİL ÇİFT DOKUNMA ZOOM ENGELLEME ============ */
+  // iOS Safari için
+  document.addEventListener('gesturestart', function(e) {
+    e.preventDefault();
+  });
+  document.addEventListener('gesturechange', function(e) {
+    e.preventDefault();
+  });
+  document.addEventListener('gestureend', function(e) {
+    e.preventDefault();
+  });
+
+  // Çift dokunma zoom'u engelle
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function(e) {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+      e.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, { passive: false });
+
+  // Pinch zoom'u engelle
+  document.addEventListener('touchmove', function(e) {
+    if (e.touches.length > 1) {
+      e.preventDefault();
+    }
+  }, { passive: false });
   /* ============================================================
      ⚠️ SADECE BURAYI DOLDURUN
      ============================================================ */
