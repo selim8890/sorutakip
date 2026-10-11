@@ -49,7 +49,7 @@
 
   button, a, input, select, textarea,
   .btn, .counter-btn, .pin-box, .numpad button, .gear-btn,
-  .student-item, .numpad, .modal-close {
+  .student-item, .numpad, .modal-close, .row-delete-btn {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
@@ -130,7 +130,7 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
-    .field input,
+  .field input,
   .field select {
     width: 100%;
     padding: 10px 12px;
@@ -152,7 +152,6 @@
   .field input:focus,
   .field select:focus { border-color: var(--primary-mid); }
 
-  /* Tüm field çocukları aynı genişlikte olsun */
   .field > input,
   .field > select,
   .field > .pin-box,
@@ -301,7 +300,7 @@
     .institution-card .tagline { font-size: 8px; }
   }
 
-    .pin-box {
+  .pin-box {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -420,7 +419,6 @@
   .counter-value.zero { color: var(--text-muted); }
   .action-bar { display: flex; gap: 8px; justify-content: flex-end; }
 
-  /* ============ FİLTRE ============ */
   .filter-bar {
     display: grid;
     grid-template-columns: 1fr 1fr 1.4fr;
@@ -436,7 +434,6 @@
     width: 100%;
   }
 
-  /* ============ MOBİL: TARİHLER YAN YANA, ARAMA ALTTA ============ */
   @media (max-width: 700px) {
     .filter-bar {
       grid-template-columns: 1fr 1fr;
@@ -453,7 +450,6 @@
       min-width: 0;
       width: 100%;
     }
-    /* iOS Safari'de tarih input'ları için özel düzeltme */
     .filter-bar input[type="date"] {
       -webkit-appearance: none;
       appearance: none;
@@ -491,7 +487,7 @@
     }
   }
 
-    .search-wrap {
+  .search-wrap {
     position: relative;
     display: flex;
     align-items: center;
@@ -517,7 +513,6 @@
   .search-clear.visible { display: block; }
   .search-clear:hover { background: #f3f4f6; color: var(--text); }
 
-  /* ============ TABLO ============ */
   .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   table.data {
     width: 100%;
@@ -593,6 +588,20 @@
   .num-badge.mine { color: #fff !important; background: var(--primary) !important; }
   .col-total { background: #f9fafb !important; font-weight: 700; color: var(--primary) !important; }
 
+  /* Satır silme butonu */
+  .row-delete-btn {
+    background: transparent;
+    border: none;
+    color: var(--danger);
+    font-size: 14px;
+    padding: 4px 6px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .row-delete-btn:hover { background: #fef2f2; }
+  .row-delete-btn:active { transform: scale(0.9); }
+
   .empty { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
   .empty-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
 
@@ -632,6 +641,10 @@
     align-items: center;
   }
   .modal-head h3 { font-size: 13px; font-weight: 600; }
+  .modal-head.danger {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  }
+  .modal-head.danger h3 { color: #fff; }
   .modal-close {
     background: rgba(255,255,255,0.15);
     border: none;
@@ -853,7 +866,6 @@
   }
   .logo-preview img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* ============ MOBİL — TÜM EKRANLAR ============ */
   @media (max-width: 640px) {
     body { padding: 12px 10px; }
     .panel-head { padding: 10px 14px; }
@@ -925,7 +937,6 @@
                   <span class="pin-hint" id="pinHint">Dokun</span>
                 </div>
               </div>
-              <!-- Giriş Yap butonu kaldırıldı — PIN 4 haneye tamamlanınca otomatik giriş -->
             </div>
 
             <!-- SAĞ: Kurum Kartı -->
@@ -1008,7 +1019,7 @@
             <label>Bitiş</label>
             <input type="date" id="endDate" onchange="loadRangeRecords()">
           </div>
-                    <div class="field search-field">
+          <div class="field search-field">
             <label>Öğrenci Ara</label>
             <div class="search-wrap">
               <input type="text" id="searchStudent" placeholder="İsim veya numara..."
@@ -1135,10 +1146,10 @@
   </div>
 </div>
 
-<!-- ============ NUMARA KLAVYESİ MODAL (ortak) ============ -->
+<!-- ============ NUMARA KLAVYESİ MODAL ============ -->
 <div class="modal-overlay" id="numpadModal">
   <div class="modal">
-    <div class="modal-head">
+    <div class="modal-head" id="numpadHeader">
       <h3 id="numpadTitle">🔢 Şifre Girin</h3>
       <button class="modal-close" onclick="closeNumpad()">✕</button>
     </div>
@@ -1255,6 +1266,12 @@
 
   let numpadTarget = 'subject';
 
+  // Öğretmenin bu oturumda girdiği kayıtları hatırla
+  let mySessionRecords = [];
+
+  // Silme işlemi için bekleyen kayıt
+  let pendingDelete = null;  // { studentNo, studentName, date }
+
   window.addEventListener('DOMContentLoaded', async () => {
     const today = todayLocal();
     document.getElementById('startDate').value = today;
@@ -1329,6 +1346,7 @@
 
   function openAdminLogin() {
     enteredPin = '';
+    pendingAdminAction = null;
     updateAllPinBoxes();
     const box = document.getElementById('adminPasswordDisplay');
     if (box) box.classList.remove('error');
@@ -1352,10 +1370,12 @@
         enteredPin = '';
         updateAllPinBoxes();
         closeModal('adminLoginModal');
+
         if (pendingAdminAction === 'students') {
           pendingAdminAction = null;
           showStudentsModal();
         } else {
+          pendingAdminAction = null;
           openAdminPanel();
         }
       } else {
@@ -1556,18 +1576,21 @@
   function openNumpad() {
     numpadTarget = 'subject';
     document.getElementById('numpadTitle').textContent = '🔢 Ders Şifresi';
+    document.getElementById('numpadHeader').classList.remove('danger');
     startNumpadSession();
   }
 
   function openAdminNumpad() {
     numpadTarget = 'admin';
     document.getElementById('numpadTitle').textContent = '🔢 Yönetici Şifresi';
+    document.getElementById('numpadHeader').classList.remove('danger');
     startNumpadSession();
   }
 
   function openExcelNumpad() {
     numpadTarget = 'excel';
     document.getElementById('numpadTitle').textContent = '🔢 Excel Şifresi';
+    document.getElementById('numpadHeader').classList.remove('danger');
     startNumpadSession();
   }
 
@@ -1581,6 +1604,9 @@
 
   function closeNumpad() {
     document.getElementById('numpadModal').classList.remove('active');
+    document.getElementById('numpadHeader').classList.remove('danger');
+    pendingDelete = null;
+    enteredPin = '';
   }
 
   function numpadPress(d) {
@@ -1648,10 +1674,59 @@
       submitAdminLogin();
     } else if (numpadTarget === 'excel') {
       submitExcelPassword();
+    } else if (numpadTarget === 'delete') {
+      submitDeletePassword();
     }
   }
 
-  /* ============ DERS GİRİŞİ (butonsuz — otomatik) ============ */
+  /* ============ SİLME ŞİFRESİ DOĞRULAMA ============ */
+  async function submitDeletePassword() {
+    if (!pendingDelete) return;
+
+    const { studentNo, studentName, date } = pendingDelete;
+    const pin = enteredPin;
+
+    try {
+      // Tüm derslerin şifrelerini çek
+      const { data: subjects, error: subjErr } = await sb
+        .from('subjects')
+        .select('name, password')
+        .order('id');
+
+      if (subjErr) throw subjErr;
+
+      // Girilen şifre hangi ders(ler)e ait?
+      const matchedSubjects = (subjects || [])
+        .filter(s => s.password === pin)
+        .map(s => s.name);
+
+      if (matchedSubjects.length === 0) {
+        // Hiçbir dersin şifresi değil → tekrar sor
+        showToast('❌ Şifre hatalı', 'danger');
+        numpadTarget = 'delete';
+        document.getElementById('numpadTitle').textContent = '🗑️ Silme Şifresi';
+        document.getElementById('numpadHeader').classList.add('danger');
+        enteredPin = '';
+        setTimeout(() => startNumpadSession(), 400);
+        return;
+      }
+
+      // Silinecek ders: matchedSubjects içinden bu satırda kaydı olan
+      const subject = matchedSubjects[0];
+
+      enteredPin = '';
+      pendingDelete = null;
+      updateAllPinBoxes();
+
+      await performDeleteWithSubject(studentNo, studentName, date, subject);
+    } catch (e) {
+      console.error(e);
+      showToast('Hata: ' + e.message, 'danger');
+      enteredPin = '';
+    }
+  }
+
+  /* ============ DERS GİRİŞİ ============ */
   async function doSubjectLogin() {
     const subjectName = document.getElementById('loginSubject').value;
 
@@ -1827,6 +1902,21 @@
         showToast(`${student.name} kaydedildi`, 'success');
       }
 
+      const existingSession = mySessionRecords.find(r =>
+        r.studentName === student.name && r.date === today
+      );
+      if (existingSession) {
+        if (!existingSession.subjects.includes(activeSubject)) {
+          existingSession.subjects.push(activeSubject);
+        }
+      } else {
+        mySessionRecords.push({
+          studentName: student.name,
+          date: today,
+          subjects: [activeSubject]
+        });
+      }
+
       setStatus('online');
       resetEntry();
       await loadRangeRecords();
@@ -1929,6 +2019,7 @@
           return `<th class="${cls}" data-subj="${escapeAttr(s)}">${escapeHtml(s)}</th>`;
         }).join('')}
         <th>Toplam</th>
+        <th>İşlem</th>
       </tr>
     `;
 
@@ -1953,9 +2044,84 @@
           </td>
           ${cells}
           <td class="col-total">${total}</td>
+          <td>
+            <button class="row-delete-btn"
+                    onclick="deleteRecordRow('${escapeAttr(r.student_no || '')}', '${escapeAttr(r.student_name)}', '${r.date}')"
+                    title="Kaydı sil (şifre gerekli)">🗑️</button>
+          </td>
         </tr>
       `;
     }).join('');
+  }
+
+  /* ============ SATIR SİLME — ONAYSIZ, KIRMIZI NUMPAD ============ */
+  function deleteRecordRow(studentNo, studentName, date) {
+    // Onay YOK — direkt kırmızı numpad aç
+    pendingDelete = { studentNo, studentName, date };
+
+    numpadTarget = 'delete';
+    document.getElementById('numpadTitle').textContent = '🗑️ Silme Şifresi';
+    document.getElementById('numpadHeader').classList.add('danger');
+    startNumpadSession();
+  }
+
+  async function performDeleteWithSubject(studentNo, studentName, date, subject) {
+    try {
+      setStatus('syncing');
+
+      let query = sb.from('records').select('*').eq('date', date).eq('student_name', studentName);
+      if (studentNo) {
+        query = query.eq('student_no', studentNo);
+      }
+
+      const { data: rows, error: fetchErr } = await query;
+      if (fetchErr) throw fetchErr;
+
+      if (!rows || rows.length === 0) {
+        showToast('Kayıt bulunamadı', 'warn');
+        setStatus('online');
+        return;
+      }
+
+      let deleted = false;
+
+      for (const row of rows) {
+        const counts = { ...(row.counts || {}) };
+
+        if (counts[subject] === undefined || counts[subject] === 0) {
+          continue;
+        }
+
+        delete counts[subject];
+
+        const remaining = Object.keys(counts).filter(k => counts[k] > 0).length;
+
+        if (remaining === 0) {
+          const { error: delErr } = await sb.from('records').delete().eq('id', row.id);
+          if (delErr) throw delErr;
+        } else {
+          const { error: updErr } = await sb.from('records')
+            .update({ counts, updated_at: new Date().toISOString() })
+            .eq('id', row.id);
+          if (updErr) throw updErr;
+        }
+
+        deleted = true;
+      }
+
+      setStatus('online');
+      await loadRangeRecords();
+
+      if (deleted) {
+        showToast(`🗑️ ${subject} kaydı silindi`, 'info');
+      } else {
+        showToast(`Bu öğrencinin ${subject} kaydı yok`, 'warn');
+      }
+    } catch (e) {
+      console.error(e);
+      setStatus('offline');
+      showToast('Silme hatası: ' + e.message, 'danger');
+    }
   }
 
   /* ============ EXCEL ============ */
