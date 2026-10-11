@@ -588,7 +588,6 @@
   .num-badge.mine { color: #fff !important; background: var(--primary) !important; }
   .col-total { background: #f9fafb !important; font-weight: 700; color: var(--primary) !important; }
 
-  /* Satır silme butonu */
   .row-delete-btn {
     background: transparent;
     border: none;
@@ -1266,11 +1265,8 @@
 
   let numpadTarget = 'subject';
 
-  // Öğretmenin bu oturumda girdiği kayıtları hatırla
-  let mySessionRecords = [];
-
   // Silme işlemi için bekleyen kayıt
-  let pendingDelete = null;  // { studentNo, studentName, date }
+  let pendingDelete = null;
 
   window.addEventListener('DOMContentLoaded', async () => {
     const today = todayLocal();
@@ -1351,46 +1347,6 @@
     const box = document.getElementById('adminPasswordDisplay');
     if (box) box.classList.remove('error');
     document.getElementById('adminLoginModal').classList.add('active');
-  }
-
-  async function submitAdminLogin() {
-    const pw = enteredPin;
-    if (!pw || pw.length !== PIN_LENGTH) {
-      showToast('4 haneli şifre girin', 'warn');
-      openAdminNumpad();
-      return;
-    }
-
-    try {
-      const { data, error } = await sb.rpc('verify_admin_password', { p_password: pw });
-      if (error) throw error;
-
-      if (data === true) {
-        isAdmin = true;
-        enteredPin = '';
-        updateAllPinBoxes();
-        closeModal('adminLoginModal');
-
-        if (pendingAdminAction === 'students') {
-          pendingAdminAction = null;
-          showStudentsModal();
-        } else {
-          pendingAdminAction = null;
-          openAdminPanel();
-        }
-      } else {
-        document.getElementById('adminPasswordDisplay').classList.add('error');
-        enteredPin = '';
-        updateAllPinBoxes();
-        setTimeout(() => {
-          document.getElementById('adminPasswordDisplay').classList.remove('error');
-        }, 600);
-        showToast('Yönetici şifresi hatalı', 'danger');
-      }
-    } catch (e) {
-      console.error(e);
-      showToast('Hata: ' + e.message, 'danger');
-    }
   }
 
   function openAdminPanel() {
@@ -1607,6 +1563,8 @@
     document.getElementById('numpadHeader').classList.remove('danger');
     pendingDelete = null;
     enteredPin = '';
+    updatePinDots();
+    updateAllPinBoxes();
   }
 
   function numpadPress(d) {
@@ -1666,72 +1624,40 @@
       showToast('Şifre 4 haneli olmalı', 'warn');
       return;
     }
-    closeNumpad();
 
-    if (numpadTarget === 'subject') {
-      doSubjectLogin();
-    } else if (numpadTarget === 'admin') {
-      submitAdminLogin();
-    } else if (numpadTarget === 'excel') {
-      submitExcelPassword();
-    } else if (numpadTarget === 'delete') {
-      submitDeletePassword();
-    }
-  }
-
-  /* ============ SİLME ŞİFRESİ DOĞRULAMA ============ */
-  async function submitDeletePassword() {
-    if (!pendingDelete) return;
-
-    const { studentNo, studentName, date } = pendingDelete;
+    // ⭐ Pin'i ve hedefi ÖNCE kopyala
     const pin = enteredPin;
+    const target = numpadTarget;
 
-    try {
-      // Tüm derslerin şifrelerini çek
-      const { data: subjects, error: subjErr } = await sb
-        .from('subjects')
-        .select('name, password')
-        .order('id');
+    // Numpad'i kapat (enteredPin sıfırlanır ama pin kopyalandı)
+    document.getElementById('numpadModal').classList.remove('active');
+    document.getElementById('numpadHeader').classList.remove('danger');
+    enteredPin = '';
+    updatePinDots();
+    updateAllPinBoxes();
 
-      if (subjErr) throw subjErr;
-
-      // Girilen şifre hangi ders(ler)e ait?
-      const matchedSubjects = (subjects || [])
-        .filter(s => s.password === pin)
-        .map(s => s.name);
-
-      if (matchedSubjects.length === 0) {
-        // Hiçbir dersin şifresi değil → tekrar sor
-        showToast('❌ Şifre hatalı', 'danger');
-        numpadTarget = 'delete';
-        document.getElementById('numpadTitle').textContent = '🗑️ Silme Şifresi';
-        document.getElementById('numpadHeader').classList.add('danger');
-        enteredPin = '';
-        setTimeout(() => startNumpadSession(), 400);
-        return;
-      }
-
-      // Silinecek ders: matchedSubjects içinden bu satırda kaydı olan
-      const subject = matchedSubjects[0];
-
-      enteredPin = '';
-      pendingDelete = null;
-      updateAllPinBoxes();
-
-      await performDeleteWithSubject(studentNo, studentName, date, subject);
-    } catch (e) {
-      console.error(e);
-      showToast('Hata: ' + e.message, 'danger');
-      enteredPin = '';
+    // ⭐ Pin'i parametre olarak gönder
+    if (target === 'subject') {
+      doSubjectLoginWithPin(pin);
+    } else if (target === 'admin') {
+      submitAdminLoginWithPin(pin);
+    } else if (target === 'excel') {
+      submitExcelPasswordWithPin(pin);
+    } else if (target === 'delete') {
+      submitDeletePasswordWithPin(pin);
     }
   }
 
-  /* ============ DERS GİRİŞİ ============ */
-  async function doSubjectLogin() {
+  /* ============ PİN PARAMETRELİ İŞLEMLER ============ */
+
+  async function doSubjectLoginWithPin(pin) {
     const subjectName = document.getElementById('loginSubject').value;
 
-    if (!subjectName) { showToast('Ders seçin', 'warn'); return; }
-    if (enteredPin.length !== PIN_LENGTH) {
+    if (!subjectName) {
+      showToast('Ders seçin', 'warn');
+      return;
+    }
+    if (!pin || pin.length !== PIN_LENGTH) {
       showToast('4 haneli şifre girin', 'warn');
       openNumpad();
       return;
@@ -1740,18 +1666,14 @@
     try {
       const { data: pwdOk, error: pwdErr } = await sb.rpc('verify_subject_password', {
         p_subject: subjectName,
-        p_password: enteredPin
+        p_password: pin
       });
       if (pwdErr) throw pwdErr;
       if (!pwdOk) {
         showToast('Şifre hatalı', 'danger');
         document.getElementById('pinBox').classList.add('error');
         setTimeout(() => {
-          enteredPin = '';
-          updatePinDots();
-          updateAllPinBoxes();
           document.getElementById('pinBox').classList.remove('error');
-          document.getElementById('numpadEnterBtn').disabled = true;
         }, 600);
         return;
       }
@@ -1773,7 +1695,6 @@
         display: teacherData.display_name
       };
 
-      enteredPin = '';
       openSubject(subjectName);
       showToast(`${subjectName} açıldı`, 'success');
     } catch (e) {
@@ -1782,6 +1703,106 @@
     }
   }
 
+  async function submitAdminLoginWithPin(pin) {
+    if (!pin || pin.length !== PIN_LENGTH) {
+      showToast('4 haneli şifre girin', 'warn');
+      openAdminNumpad();
+      return;
+    }
+
+    try {
+      const { data, error } = await sb.rpc('verify_admin_password', { p_password: pin });
+      if (error) throw error;
+
+      if (data === true) {
+        isAdmin = true;
+        closeModal('adminLoginModal');
+
+        if (pendingAdminAction === 'students') {
+          pendingAdminAction = null;
+          showStudentsModal();
+        } else {
+          pendingAdminAction = null;
+          openAdminPanel();
+        }
+      } else {
+        document.getElementById('adminPasswordDisplay').classList.add('error');
+        setTimeout(() => {
+          document.getElementById('adminPasswordDisplay').classList.remove('error');
+        }, 600);
+        showToast('Yönetici şifresi hatalı', 'danger');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Hata: ' + e.message, 'danger');
+    }
+  }
+
+  async function submitExcelPasswordWithPin(pin) {
+    if (!pin || pin.length !== PIN_LENGTH) {
+      showToast('4 haneli şifre girin', 'warn');
+      openExcelNumpad();
+      return;
+    }
+
+    try {
+      const { data, error } = await sb.rpc('verify_excel_password', { p_password: pin });
+      if (error) throw error;
+
+      if (data === true) {
+        closeModal('excelModal');
+        downloadExcel();
+      } else {
+        document.getElementById('excelPasswordDisplay').classList.add('error');
+        setTimeout(() => {
+          document.getElementById('excelPasswordDisplay').classList.remove('error');
+        }, 600);
+        showToast('Şifre hatalı', 'danger');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('Hata: ' + e.message, 'danger');
+    }
+  }
+
+  async function submitDeletePasswordWithPin(pin) {
+    if (!pendingDelete) return;
+
+    const { studentNo, studentName, date } = pendingDelete;
+
+    try {
+      const { data: subjects, error: subjErr } = await sb
+        .from('subjects')
+        .select('name, password')
+        .order('id');
+
+      if (subjErr) throw subjErr;
+
+      const matchedSubjects = (subjects || [])
+        .filter(s => s.password === pin)
+        .map(s => s.name);
+
+      if (matchedSubjects.length === 0) {
+        showToast('❌ Şifre hatalı', 'danger');
+        // Tekrar kırmızı numpad aç
+        numpadTarget = 'delete';
+        document.getElementById('numpadTitle').textContent = '🗑️ Silme Şifresi';
+        document.getElementById('numpadHeader').classList.add('danger');
+        setTimeout(() => startNumpadSession(), 400);
+        return;
+      }
+
+      const subject = matchedSubjects[0];
+      pendingDelete = null;
+
+      await performDeleteWithSubject(studentNo, studentName, date, subject);
+    } catch (e) {
+      console.error(e);
+      showToast('Hata: ' + e.message, 'danger');
+    }
+  }
+
+  /* ============ DERS AÇMA / KAPAMA ============ */
   function openSubject(subjectName) {
     activeSubject = subjectName;
     activeUnlockTime = Date.now();
@@ -1900,21 +1921,6 @@
         });
         if (error) throw error;
         showToast(`${student.name} kaydedildi`, 'success');
-      }
-
-      const existingSession = mySessionRecords.find(r =>
-        r.studentName === student.name && r.date === today
-      );
-      if (existingSession) {
-        if (!existingSession.subjects.includes(activeSubject)) {
-          existingSession.subjects.push(activeSubject);
-        }
-      } else {
-        mySessionRecords.push({
-          studentName: student.name,
-          date: today,
-          subjects: [activeSubject]
-        });
       }
 
       setStatus('online');
@@ -2054,7 +2060,7 @@
     }).join('');
   }
 
-  /* ============ SATIR SİLME — ONAYSIZ, KIRMIZI NUMPAD ============ */
+  /* ============ SATIR SİLME ============ */
   function deleteRecordRow(studentNo, studentName, date) {
     // Onay YOK — direkt kırmızı numpad aç
     pendingDelete = { studentNo, studentName, date };
@@ -2135,35 +2141,8 @@
   }
 
   async function submitExcelPassword() {
-    const entered = enteredPin;
-    if (!entered || entered.length !== PIN_LENGTH) {
-      showToast('4 haneli şifre girin', 'warn');
-      openExcelNumpad();
-      return;
-    }
-
-    try {
-      const { data, error } = await sb.rpc('verify_excel_password', { p_password: entered });
-      if (error) throw error;
-
-      if (data === true) {
-        enteredPin = '';
-        updateAllPinBoxes();
-        closeModal('excelModal');
-        downloadExcel();
-      } else {
-        document.getElementById('excelPasswordDisplay').classList.add('error');
-        enteredPin = '';
-        updateAllPinBoxes();
-        setTimeout(() => {
-          document.getElementById('excelPasswordDisplay').classList.remove('error');
-        }, 600);
-        showToast('Şifre hatalı', 'danger');
-      }
-    } catch (e) {
-      console.error(e);
-      showToast('Hata: ' + e.message, 'danger');
-    }
+    // Bu fonksiyon artık kullanılmıyor ama modal butonu için bırakıyorum
+    openExcelNumpad();
   }
 
   function downloadExcel() {
