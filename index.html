@@ -1952,22 +1952,20 @@
     }
   }
 
-  function downloadExcel() {
+    function downloadExcel() {
     const start = document.getElementById('startDate').value;
     const end = document.getElementById('endDate').value;
     const q = document.getElementById('searchStudent').value.trim();
 
     const d1 = new Date(start + 'T00:00:00');
     const d2 = new Date(end + 'T00:00:00');
-    const dateLabel = start === end
-      ? formatDateShort(d1)
-      : `${formatDateShort(d1)} — ${formatDateShort(d2)}`;
 
     const rows = [];
 
     // Üst başlık
     rows.push(['SORU TAKİP RAPORU']);
-    rows.push(['Tarih Aralığı:', dateLabel]);
+    rows.push(['Başlangıç Tarihi:', formatDateShort(d1)]);
+    rows.push(['Bitiş Tarihi:', formatDateShort(d2)]);
     rows.push(['Öğrenci Sayısı:', filteredRecords.length]);
     if (q) rows.push(['Filtre:', q]);
     rows.push([]); // boş satır
