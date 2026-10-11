@@ -475,23 +475,20 @@
     }
   }
 
-  .search-wrap { position: relative; }
-  .search-wrap input { padding-left: 32px; }
-  .search-wrap::before {
-    content: '🔍';
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 13px;
-    pointer-events: none;
-    opacity: 0.6;
+    .search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  .search-wrap input {
+    flex: 1;
+    min-width: 0;
   }
   .search-clear {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
+    position: static;
+    flex-shrink: 0;
     background: transparent;
     border: none;
     color: var(--text-muted);
@@ -995,7 +992,7 @@
             <label>Bitiş</label>
             <input type="date" id="endDate" onchange="loadRangeRecords()">
           </div>
-          <div class="field search-field">
+                    <div class="field search-field">
             <label>Öğrenci Ara</label>
             <div class="search-wrap">
               <input type="text" id="searchStudent" placeholder="İsim veya numara..."
