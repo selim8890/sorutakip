@@ -29,24 +29,12 @@
     --subj-sos: #f59e0b;
     --subj-ing: #8b5cf6;
   }
-    /* ============ ÇİFT DOKUNMA ZOOM ENGELLEME ============ */
   html {
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     touch-action: manipulation;
   }
-  body {
-    touch-action: manipulation;
-  }
-  /* Tüm tıklanabilir öğelerde zoom engellensin */
-  button, a, input, select, textarea,
-  .btn, .counter-btn, .pin-box, .numpad button, .gear-btn,
-  .student-item, .numpad, .modal-close {
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-  }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html { -webkit-text-size-adjust: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg);
@@ -56,6 +44,14 @@
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     padding: 16px 14px;
+    touch-action: manipulation;
+  }
+
+  button, a, input, select, textarea,
+  .btn, .counter-btn, .pin-box, .numpad button, .gear-btn,
+  .student-item, .numpad, .modal-close {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .container { max-width: 1280px; margin: 0 auto; }
@@ -73,7 +69,6 @@
     .main-row { grid-template-columns: 1fr; }
   }
 
-  /* ============ PANEL ============ */
   .panel {
     background: var(--surface);
     border-radius: var(--radius);
@@ -94,7 +89,6 @@
   .panel-sub { font-size: 11px; color: rgba(255,255,255,0.75); margin-top: 1px; }
   .panel-body { padding: 14px 16px; }
 
-  /* ============ BUTONLAR ============ */
   button {
     font-family: inherit;
     border: none;
@@ -125,7 +119,6 @@
   .btn-danger:hover { background: #fee2e2; }
   .btn-sm { padding: 6px 11px; font-size: 11px; }
 
-  /* ============ FORM ============ */
   .field { margin-bottom: 10px; }
   .field:last-child { margin-bottom: 0; }
   .field label {
@@ -140,21 +133,21 @@
   .field input,
   .field select {
     width: 100%;
-    padding: 8px 11px;
+    padding: 10px 12px;
     border: 2px solid #e5e7eb;
     border-radius: var(--radius-sm);
-    font-size: 13px;
+    font-size: 14px;
     font-family: inherit;
     color: var(--text);
     background: #fff;
     outline: none;
     transition: border-color 0.15s;
     font-weight: 500;
+    min-width: 0;
   }
   .field input:focus,
   .field select:focus { border-color: var(--primary-mid); }
 
-  /* ============ LOGIN BODY — İKİ SÜTUN ============ */
   .login-body {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -165,11 +158,10 @@
   .login-form-col {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     min-width: 0;
   }
 
-  /* Kurum kartı (sağda) */
   .institution-card {
     display: flex;
     flex-direction: column;
@@ -243,18 +235,15 @@
     transform: rotate(45deg);
   }
 
-  /* Mobil */
   @media (max-width: 640px) {
     .login-body {
       grid-template-columns: 1fr auto;
       gap: 10px;
     }
-    .login-form-col {
-      gap: 8px;
-    }
+    .login-form-col { gap: 10px; }
     .institution-card {
-      min-width: 130px;
-      max-width: 140px;
+      min-width: 120px;
+      max-width: 130px;
       padding: 12px 8px;
       gap: 8px;
     }
@@ -266,12 +255,10 @@
     }
     .institution-card .school-name {
       font-size: 11px;
-      max-width: 120px;
+      max-width: 110px;
       line-height: 1.25;
     }
-    .institution-card .tagline {
-      font-size: 9px;
-    }
+    .institution-card .tagline { font-size: 9px; }
     .institution-card .gear-btn {
       width: 24px;
       height: 24px;
@@ -281,43 +268,38 @@
     }
   }
 
-  /* Çok küçük ekranlar */
   @media (max-width: 380px) {
-    .login-body {
-      gap: 8px;
-    }
+    .login-body { gap: 8px; }
     .institution-card {
-      min-width: 110px;
-      max-width: 120px;
+      min-width: 100px;
+      max-width: 110px;
       padding: 10px 6px;
     }
     .institution-card .logo-circle {
-      width: 56px;
-      height: 56px;
-      font-size: 28px;
+      width: 52px;
+      height: 52px;
+      font-size: 26px;
     }
     .institution-card .school-name {
       font-size: 10px;
-      max-width: 105px;
+      max-width: 95px;
     }
-    .institution-card .tagline {
-      font-size: 8px;
-    }
+    .institution-card .tagline { font-size: 8px; }
   }
 
-  /* ============ PIN ============ */
   .pin-box {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    padding: 8px 12px;
+    padding: 10px 12px;
     border: 2px solid #e5e7eb;
     border-radius: var(--radius-sm);
     background: #fff;
     cursor: pointer;
     transition: all 0.15s;
-    min-height: 40px;
+    min-height: 44px;
+    touch-action: manipulation;
   }
   .pin-box:active { border-color: var(--primary-mid); }
   .pin-box.filled { border-color: var(--primary-mid); background: var(--primary-light); }
@@ -333,7 +315,6 @@
   .pin-box .pin-dot-sm.filled { background: var(--primary-mid); border-color: var(--primary-mid); }
   .pin-box .pin-hint { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-  /* ============ AKTİF DERS ============ */
   .active-banner {
     display: flex;
     justify-content: space-between;
@@ -434,9 +415,64 @@
     align-items: end;
   }
   .filter-bar .field { margin-bottom: 0; }
+  .filter-bar .field input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* ============ MOBİL: TARİHLER YAN YANA, ARAMA ALTTA ============ */
   @media (max-width: 700px) {
-    .filter-bar { grid-template-columns: 1fr 1fr; }
-    .filter-bar .search-field { grid-column: 1 / -1; }
+    .filter-bar {
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 10px 12px;
+    }
+    .filter-bar .search-field {
+      grid-column: 1 / -1;
+      margin-top: 4px;
+    }
+    .filter-bar .field input {
+      padding: 8px 6px;
+      font-size: 12px;
+      min-width: 0;
+      width: 100%;
+    }
+    /* iOS Safari'de tarih input'ları için özel düzeltme */
+    .filter-bar input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      min-width: 0;
+    }
+    .filter-bar input[type="date"]::-webkit-date-and-time-value {
+      text-align: left;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .filter-bar {
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      padding: 8px 10px;
+    }
+    .filter-bar .search-field {
+      grid-column: 1 / -1;
+      margin-top: 4px;
+    }
+    .filter-bar .field input {
+      padding: 7px 5px;
+      font-size: 11px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .filter-bar {
+      gap: 4px;
+      padding: 8px 8px;
+    }
+    .filter-bar .field input {
+      padding: 6px 4px;
+      font-size: 10.5px;
+    }
   }
 
   .search-wrap { position: relative; }
@@ -547,7 +583,6 @@
   .empty { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
   .empty-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
 
-  /* ============ MODAL ============ */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -559,9 +594,7 @@
     justify-content: center;
     padding: 16px;
   }
-  #numpadModal {
-    z-index: 200;
-  }
+  #numpadModal { z-index: 200; }
   .modal-overlay.active { display: flex; }
   .modal {
     background: var(--surface);
@@ -656,7 +689,7 @@
   .student-toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
   .student-toolbar input {
     flex: 1;
-    padding: 8px 11px;
+    padding: 9px 11px;
     border: 2px solid #e5e7eb;
     border-radius: var(--radius-sm);
     font-size: 13px;
@@ -677,7 +710,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 12px;
+    padding: 9px 12px;
     border-bottom: 1px solid var(--border);
     font-size: 13px;
     background: #fff;
@@ -703,7 +736,7 @@
   .student-item .actions button.del { color: var(--danger); }
   .student-item .actions button.del:hover { background: #fef2f2; border-color: #fecaca; }
 
-    .add-student-row {
+  .add-student-row {
     display: grid;
     grid-template-columns: 70px 1fr 90px;
     gap: 6px;
@@ -807,19 +840,34 @@
   }
   .logo-preview img { width: 100%; height: 100%; object-fit: cover; }
 
+  /* ============ MOBİL — TÜM EKRANLAR ============ */
   @media (max-width: 640px) {
     body { padding: 12px 10px; }
     .panel-head { padding: 10px 14px; }
     .panel-title { font-size: 13px; }
     .panel-sub { font-size: 10px; }
     .panel-body { padding: 12px 14px; }
-    .filter-bar { padding: 10px 14px; }
+
     table.data thead th { padding: 8px 6px; font-size: 10px; }
     table.data thead th.col-name { padding-left: 12px; min-width: 110px; }
     table.data tbody td { padding: 9px 6px; font-size: 12px; }
     table.data tbody td.col-name { padding-left: 12px; min-width: 110px; font-size: 11px; }
     .counter-btn { width: 40px; height: 40px; font-size: 18px; }
     .counter-value { font-size: 26px; }
+  }
+
+  @media (max-width: 400px) {
+    body { padding: 10px 8px; }
+    .panel-head { padding: 9px 12px; }
+    .panel-title { font-size: 12px; }
+    .panel-sub { font-size: 9px; }
+    .panel-body { padding: 10px 12px; }
+    table.data thead th { padding: 7px 5px; font-size: 9px; }
+    table.data thead th.col-name { padding-left: 10px; min-width: 100px; }
+    table.data tbody td { padding: 8px 5px; font-size: 11px; }
+    table.data tbody td.col-name { padding-left: 10px; min-width: 100px; font-size: 10px; }
+    .counter-btn { width: 38px; height: 38px; font-size: 17px; }
+    .counter-value { font-size: 24px; }
   }
 </style>
 </head>
@@ -864,9 +912,7 @@
                   <span class="pin-hint" id="pinHint">Dokun</span>
                 </div>
               </div>
-              <button class="btn btn-primary" onclick="doSubjectLogin()" id="loginBtn" style="width:100%;">
-                🔓 Giriş Yap
-              </button>
+              <!-- Giriş Yap butonu kaldırıldı — PIN 4 haneye tamamlanınca otomatik giriş -->
             </div>
 
             <!-- SAĞ: Kurum Kartı -->
@@ -895,7 +941,7 @@
         <div class="panel-body">
           <div class="active-banner">
             <div class="subject" id="activeSubjectName">—</div>
-            <div class="timer" id="activeTimer">30s</div>
+            <div class="timer" id="activeTimer">20s</div>
           </div>
 
           <div class="entry-stack">
@@ -1136,18 +1182,10 @@
 
 <script>
   /* ============ MOBİL ÇİFT DOKUNMA ZOOM ENGELLEME ============ */
-  // iOS Safari için
-  document.addEventListener('gesturestart', function(e) {
-    e.preventDefault();
-  });
-  document.addEventListener('gesturechange', function(e) {
-    e.preventDefault();
-  });
-  document.addEventListener('gestureend', function(e) {
-    e.preventDefault();
-  });
+  document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+  document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
+  document.addEventListener('gestureend', function(e) { e.preventDefault(); });
 
-  // Çift dokunma zoom'u engelle
   let lastTouchEnd = 0;
   document.addEventListener('touchend', function(e) {
     const now = Date.now();
@@ -1157,12 +1195,12 @@
     lastTouchEnd = now;
   }, { passive: false });
 
-  // Pinch zoom'u engelle
   document.addEventListener('touchmove', function(e) {
     if (e.touches.length > 1) {
       e.preventDefault();
     }
   }, { passive: false });
+
   /* ============================================================
      ⚠️ SADECE BURAYI DOLDURUN
      ============================================================ */
@@ -1172,9 +1210,18 @@
 
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  /* ============ YEREL TARİH (TR saati) ============ */
+  function todayLocal() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const g = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${g}`;
+  }
+
   const UNLOCK_DURATION = 20 * 1000;
-  const WARN_THRESHOLD = 10 * 1000;
-  const DANGER_THRESHOLD = 5 * 1000;
+  const WARN_THRESHOLD = 8 * 1000;
+  const DANGER_THRESHOLD = 4 * 1000;
   const PIN_LENGTH = 4;
 
   let students = [];
@@ -1193,7 +1240,6 @@
   let schoolName = 'Kurum Adı';
   let pendingAdminAction = null;
 
-  /* Numpad hedefi: 'subject' | 'admin' | 'excel' */
   let numpadTarget = 'subject';
 
   window.addEventListener('DOMContentLoaded', async () => {
@@ -1206,7 +1252,6 @@
     await loadStudents();
     await loadRangeRecords();
 
-    // ⏰ Gece yarısı otomatik gün geçişi + periyodik yenileme
     let lastKnownToday = todayLocal();
 
     setInterval(() => {
@@ -1232,7 +1277,6 @@
       }
     }, 30000);
 
-    // ⏰ Sekme arka plandan geri geldiğinde gün değişimini yakala
     window.addEventListener('focus', () => {
       const today = todayLocal();
       const start = document.getElementById('startDate').value;
@@ -1393,13 +1437,12 @@
     if (cur) sel.value = cur;
   }
 
-    function openStudentsModal() {
+  function openStudentsModal() {
     if (!isAdmin) {
       pendingAdminAction = 'students';
       enteredPin = '';
       updateAllPinBoxes();
       document.getElementById('adminLoginModal').classList.add('active');
-      // 🎯 Direkt numpad'i aç
       setTimeout(() => openAdminNumpad(), 100);
       return;
     }
@@ -1595,7 +1638,7 @@
     }
   }
 
-  /* ============ DERS GİRİŞİ ============ */
+  /* ============ DERS GİRİŞİ (butonsuz — otomatik) ============ */
   async function doSubjectLogin() {
     const subjectName = document.getElementById('loginSubject').value;
 
@@ -1605,10 +1648,6 @@
       openNumpad();
       return;
     }
-
-    const btn = document.getElementById('loginBtn');
-    btn.disabled = true;
-    btn.textContent = 'Kontrol...';
 
     try {
       const { data: pwdOk, error: pwdErr } = await sb.rpc('verify_subject_password', {
@@ -1652,9 +1691,6 @@
     } catch (e) {
       console.error(e);
       showToast('Hata: ' + (e.message || 'Bilinmeyen'), 'danger');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '🔓 Giriş Yap';
     }
   }
 
@@ -1910,13 +1946,12 @@
   }
 
   /* ============ EXCEL ============ */
-    function openExcelModal() {
+  function openExcelModal() {
     if (filteredRecords.length === 0) { showToast('Bu kriterlerde kayıt yok', 'warn'); return; }
     enteredPin = '';
     updateAllPinBoxes();
     document.getElementById('excelPasswordDisplay').classList.remove('error');
     document.getElementById('excelModal').classList.add('active');
-    // 🎯 Direkt numpad'i aç
     setTimeout(() => openExcelNumpad(), 100);
   }
 
@@ -1952,7 +1987,7 @@
     }
   }
 
-    function downloadExcel() {
+  function downloadExcel() {
     const start = document.getElementById('startDate').value;
     const end = document.getElementById('endDate').value;
     const q = document.getElementById('searchStudent').value.trim();
@@ -1962,21 +1997,18 @@
 
     const rows = [];
 
-    // Üst başlık
     rows.push(['SORU TAKİP RAPORU']);
     rows.push(['Başlangıç Tarihi:', formatDateShort(d1)]);
     rows.push(['Bitiş Tarihi:', formatDateShort(d2)]);
     rows.push(['Öğrenci Sayısı:', filteredRecords.length]);
     if (q) rows.push(['Filtre:', q]);
-    rows.push([]); // boş satır
+    rows.push([]);
 
-    // Tablo başlık satırı — ekrandaki gibi
     const header = ['Öğrenci'];
     allSubjects.forEach(s => header.push(s));
     header.push('Toplam');
     rows.push(header);
 
-    // Veri satırları
     filteredRecords.forEach(r => {
       let total = 0;
       const row = [(r.student_no ? r.student_no + ' - ' : '') + r.student_name];
@@ -1989,7 +2021,6 @@
       rows.push(row);
     });
 
-    // Toplam satırı
     const totalRow = ['TOPLAM'];
     allSubjects.forEach(subj => {
       let s = 0;
@@ -2000,7 +2031,6 @@
       sum + allSubjects.reduce((s2, subj) => s2 + (r.counts[subj] || 0), 0), 0));
     rows.push(totalRow);
 
-    // CSV üret (noktalı virgül — Türkçe Excel uyumlu)
     const csv = '\uFEFF' + rows.map(r =>
       r.map(c => {
         const str = String(c ?? '');
@@ -2058,13 +2088,7 @@
     const pad = n => String(n).padStart(2, '0');
     return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}`;
   }
-function todayLocal() {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const g = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${g}`;
-  }
+
   function escapeHtml(s) {
     return String(s ?? '').replace(/[&<>"']/g, c => ({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
