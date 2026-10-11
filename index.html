@@ -130,7 +130,7 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
-  .field input,
+    .field input,
   .field select {
     width: 100%;
     padding: 10px 12px;
@@ -144,9 +144,23 @@
     transition: border-color 0.15s;
     font-weight: 500;
     min-width: 0;
+    height: 44px;
+    box-sizing: border-box;
+    display: block;
+    line-height: 1.2;
   }
   .field input:focus,
   .field select:focus { border-color: var(--primary-mid); }
+
+  /* Tüm field çocukları aynı genişlikte olsun */
+  .field > input,
+  .field > select,
+  .field > .pin-box,
+  .field > .search-wrap,
+  .field > .pw-input {
+    width: 100%;
+    box-sizing: border-box;
+  }
 
   .login-body {
     display: grid;
@@ -287,7 +301,7 @@
     .institution-card .tagline { font-size: 8px; }
   }
 
-  .pin-box {
+    .pin-box {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -298,7 +312,9 @@
     background: #fff;
     cursor: pointer;
     transition: all 0.15s;
-    min-height: 44px;
+    height: 44px;
+    box-sizing: border-box;
+    width: 100%;
     touch-action: manipulation;
   }
   .pin-box:active { border-color: var(--primary-mid); }
