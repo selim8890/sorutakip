@@ -1197,7 +1197,7 @@
   let numpadTarget = 'subject';
 
   window.addEventListener('DOMContentLoaded', async () => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocal();
     document.getElementById('startDate').value = today;
     document.getElementById('endDate').value = today;
 
@@ -1207,10 +1207,10 @@
     await loadRangeRecords();
 
     // ⏰ Gece yarısı otomatik gün geçişi + periyodik yenileme
-    let lastKnownToday = new Date().toISOString().slice(0, 10);
+    let lastKnownToday = todayLocal();
 
     setInterval(() => {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayLocal();
       const start = document.getElementById('startDate').value;
       const end = document.getElementById('endDate').value;
 
@@ -1234,7 +1234,7 @@
 
     // ⏰ Sekme arka plandan geri geldiğinde gün değişimini yakala
     window.addEventListener('focus', () => {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayLocal();
       const start = document.getElementById('startDate').value;
       const end = document.getElementById('endDate').value;
       if (start === end && start !== today && start === lastKnownToday) {
@@ -1737,7 +1737,7 @@
     const student = students.find(s => s.id == studentId);
     if (!student) return;
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocal();
     setStatus('syncing');
 
     const { data: existing, error: findErr } = await sb
@@ -2058,7 +2058,13 @@
     const pad = n => String(n).padStart(2, '0');
     return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}`;
   }
-
+function todayLocal() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const g = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${g}`;
+  }
   function escapeHtml(s) {
     return String(s ?? '').replace(/[&<>"']/g, c => ({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
