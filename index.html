@@ -2016,13 +2016,28 @@
     const dates = [...new Set(filteredRecords.map(r => r.date))];
     const showDateCol = dates.length > 1;
 
+        // Ders bazlı toplamları hesapla (başlıkta göstermek için)
+    const subjectTotals = {};
+    allSubjects.forEach(subj => subjectTotals[subj] = 0);
+    filteredRecords.forEach(r => {
+      allSubjects.forEach(subj => {
+        subjectTotals[subj] += (r.counts[subj] || 0);
+      });
+    });
+
     head.innerHTML = `
       <tr>
         ${showDateCol ? '<th>Tarih</th>' : ''}
         <th class="col-name">Öğrenci</th>
         ${allSubjects.map(s => {
           const cls = s === activeSubject ? 'highlight' : '';
-          return `<th class="${cls}" data-subj="${escapeAttr(s)}">${escapeHtml(s)}</th>`;
+          const total = subjectTotals[s] || 0;
+          return `<th class="${cls}" data-subj="${escapeAttr(s)}">
+            <div style="font-weight:700; font-size:11px;">${escapeHtml(s)}</div>
+            <div style="font-size:11px; font-weight:700; color:${cls ? '#4a3f8a' : '#9ca3af'}; margin-top:1px; opacity:0.85;">
+              ${total}
+            </div>
+          </th>`;
         }).join('')}
         <th>Toplam</th>
         <th>İşlem</th>
